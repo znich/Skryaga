@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Skryaga.iml" filepath="$PROJECT_DIR$/Skryaga.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Skryaga/Skryaga-Skryaga.iml" filepath="$PROJECT_DIR$/Skryaga/Skryaga-Skryaga.iml" />
+    </modules>
+  </component>
+</project>

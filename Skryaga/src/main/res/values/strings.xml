@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Skryaga</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="amountLabel">Amount:</string>
+    <string name="dailyAmountLabel">Daily:</string>
+    <string name="spentTodayLabel">Spending today:</string>
+    <string name="goalLabel">Goal:</string>
+    <string name="exchangeLabel">Best exchange rate:</string>
+    <string name="restLabel">Rest for today:</string>
+
+</resources>

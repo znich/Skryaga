@@ -1,0 +1,138 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingTop="@dimen/activity_vertical_margin"
+                android:paddingBottom="@dimen/activity_vertical_margin"
+                tools:context=".MainActivity" android:id="@+id/main_activity">
+
+    <TableLayout
+            android:id="@+id/main_info"
+            android:layout_width="fill_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:columnCount="2"
+            android:rowCount="3"
+            android:stretchColumns="0,1"
+            style="@style/mainInfo">
+
+        <TableRow android:layout_width="match_parent" android:layout_height="wrap_content">
+            <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/amountLabel"
+                        android:id="@+id/total_amount_label"
+                        android:textIsSelectable="false"
+                        style="@style/mainInfoTextLabel"/>
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:id="@+id/total_amount_field"
+                        android:layout_gravity="center"
+                        style="@style/mainInfoText"/>
+            </LinearLayout>
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/dailyAmountLabel"
+                        android:id="@+id/daily_amount_label"
+                        style="@style/mainInfoTextLabel"/>
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:id="@+id/daily_amount_field"
+                        style="@style/mainInfoText"/>
+                <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/imageButton"
+                        android:background="@drawable/ic_refresh_white_36dp"
+                        android:onClick="onStatisticsUpdate"
+                        android:clickable="true" android:layout_gravity="center_vertical"
+                        style="@style/buttonStyle" android:layout_marginLeft="20dp"/>
+            </LinearLayout>
+        </TableRow>
+
+        <TableRow android:layout_width="match_parent" android:layout_height="wrap_content">
+            <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/spentTodayLabel"
+                        android:id="@+id/spent_amount_label"
+                        style="@style/mainInfoTextLabel"/>
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:id="@+id/spent_amount_field"
+                        style="@style/mainInfoText"/>
+            </LinearLayout>
+            <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/goalLabel"
+                        android:id="@+id/goal_amount_label"
+                        style="@style/mainInfoTextLabel"/>
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="600$"
+                        android:id="@+id/goal_amount_field"
+                        style="@style/mainInfoText"/>
+            </LinearLayout>
+        </TableRow>
+        <TableRow android:layout_width="match_parent" android:layout_height="wrap_content"
+                  android:clickable="true" android:onClick="onStatisticsUpdate">
+            <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/restLabel"
+                        android:id="@+id/rest_amount_label"
+                        style="@style/mainInfoTextLabel"/>
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:id="@+id/rest_amount_field"
+                        style="@style/mainInfoText"/>
+            </LinearLayout>
+            <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/exchangeLabel"
+                        android:id="@+id/exchange_amount_label"
+                        style="@style/mainInfoTextLabel"/>
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:id="@+id/exchange_amount_field"
+                        style="@style/mainInfoText"/>
+            </LinearLayout>
+        </TableRow>
+
+    </TableLayout>
+</RelativeLayout>
