@@ -151,8 +151,8 @@ public class CalculationServiceImpl implements CalculationService {
 
     private DateTime getNextSalaryDate() {
         //TODO: AL calculate date according on salary date from settings and holidays
-        DateTime salaryDate = Settings.getInstance().getSalaryDate();
-        return salaryDate;
+        Integer salaryDate = Settings.getInstance().getSalaryDate();
+        return new DateTime().withDayOfMonth(salaryDate);
     }
 
     private BigDecimal getPrepaidShortage(SpendingStatistics spendingStatistics) {
@@ -188,7 +188,7 @@ public class CalculationServiceImpl implements CalculationService {
 
     private DateTime getPrepaidDate() {
         //TODO: AL  get prepaid date from settings
-        DateTime prepaidDate = Settings.getInstance().getPrepaidDate();
-        return prepaidDate;
+        Integer prepaidDate = Settings.getInstance().getPrepaidDate();
+        return new DateTime().withDayOfMonth(prepaidDate);
     }
 }

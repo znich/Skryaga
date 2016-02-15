@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimaryDark">#00838F</color>
+    <color name="colorWhite">#e2e2e2</color>
+
+    <color name="white">#ffffff</color>
+    <color name="teraLight">#E8DDCB</color>
+    <color name="tera">#CDB380</color>
+    <color name="acqua">#036564</color>
+    <color name="acquaProfonda">#033649</color>
+    <color name="abisso">#031634</color>
+</resources>

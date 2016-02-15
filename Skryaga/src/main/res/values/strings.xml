@@ -8,7 +8,15 @@
     <string name="dailyAmountLabel">Daily:</string>
     <string name="spentTodayLabel">Spending today:</string>
     <string name="goalLabel">Goal:</string>
-    <string name="exchangeLabel">Best exchange rate:</string>
+    <string name="exchangeLabel">Best rate:</string>
     <string name="restLabel">Rest for today:</string>
+    <string name="refresh">refresh</string>
+    <string name="toolbarTitle">Skryaga</string>
+    <string name="settings">settings</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="selectSalaryDate">Select salary date</string>
+    <string name="selectPrepaidDate">Select prepaid date</string>
+
 
 </resources>

@@ -1,10 +1,23 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <by.laguta.skryaga.activity.preference.DatePreference
+            android:key="@string/salaryDate"
+            android:dialogTitle="@string/selectSalaryDate"
+            android:title="@string/selectSalaryDate"
+            android:defaultValue="9"/>
+
+    <by.laguta.skryaga.activity.preference.DatePreference
+            android:key="@string/prepaidDate"
+            android:dialogTitle="@string/selectPrepaidDate"
+            android:title="@string/selectPrepaidDate"
+            android:defaultValue="23"/>
+
     <CheckBoxPreference
-        android:key="example_checkbox"
+        android:key="111"
         android:title="@string/pref_title_social_recommendations"
         android:summary="@string/pref_description_social_recommendations"
         android:defaultValue="true" />
+
 
     <!-- NOTE: EditTextPreference accepts EditText attributes. -->
     <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->

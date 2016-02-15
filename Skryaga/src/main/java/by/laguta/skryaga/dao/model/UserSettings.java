@@ -1,9 +1,7 @@
 package by.laguta.skryaga.dao.model;
 
-import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import org.joda.time.DateTime;
 
 /**
  * Author : Anatoly
@@ -17,11 +15,20 @@ public class UserSettings {
     @DatabaseField(generatedId = true)
     private Long id;
 
-    @DatabaseField(canBeNull = false, dataType = DataType.DATE_TIME, columnName = "salaryDate")
-    private DateTime salaryDate;
+    @DatabaseField(canBeNull = false, columnName = "salaryDate")
+    private Integer salaryDate;
 
-    @DatabaseField(canBeNull = false, dataType = DataType.DATE_TIME, columnName = "prepaidDate")
-    private DateTime prepaidDate;
+    @DatabaseField(canBeNull = false, columnName = "prepaidDate")
+    private Integer prepaidDate;
+
+    public UserSettings() {
+    }
+
+    public UserSettings(Long id, Integer salaryDate, Integer prepaidDate) {
+        this.id = id;
+        this.salaryDate = salaryDate;
+        this.prepaidDate = prepaidDate;
+    }
 
     public Long getId() {
         return id;
@@ -31,26 +38,20 @@ public class UserSettings {
         this.id = id;
     }
 
-    public DateTime getSalaryDate() {
+    public Integer getSalaryDate() {
         return salaryDate;
     }
 
-    public void setSalaryDate(DateTime salaryDate) {
+    public void setSalaryDate(Integer salaryDate) {
         this.salaryDate = salaryDate;
     }
 
-    public DateTime getPrepaidDate() {
+    public Integer getPrepaidDate() {
         return prepaidDate;
     }
 
-    public void setPrepaidDate(DateTime prepaidDate) {
+    public void setPrepaidDate(Integer prepaidDate) {
         this.prepaidDate = prepaidDate;
     }
 
-    public UserSettings createDefaultSettings() {
-        new UserSettings();
-        setPrepaidDate(new DateTime().withTimeAtStartOfDay());
-        setSalaryDate(new DateTime().withTimeAtStartOfDay());
-        return this;
-    }
 }
