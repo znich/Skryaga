@@ -10,13 +10,18 @@
     <string name="goalLabel">Goal:</string>
     <string name="exchangeLabel">Best rate:</string>
     <string name="restLabel">Rest for today:</string>
-    <string name="refresh">refresh</string>
+    <string name="refresh">Refresh</string>
     <string name="toolbarTitle">Skryaga</string>
-    <string name="settings">settings</string>
+    <string name="settings">Settings</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="selectSalaryDate">Select salary date</string>
     <string name="selectPrepaidDate">Select prepaid date</string>
+    <string name="updated">Updated</string>
+    <string name="needUpdated">You must update existing transactions to start use the application!</string>
+    <string name="parsing">Parsing transactions</string>
+    <string name="progressTitle">Please wait</string>
+    <string name="updatePreference">Update exist messages</string>
 
 
 </resources>

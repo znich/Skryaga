@@ -4,7 +4,7 @@
     <item
             android:id="@+id/settings"
             android:title="@string/settings"
-            android:orderInCategory="1"
+            android:orderInCategory="2"
             android:icon="@drawable/ic_settings_white_48dp"
             app:showAsAction="ifRoom"
             android:onClick="showSettings"/>
@@ -12,7 +12,7 @@
     <item
             android:id="@+id/refresh"
             android:title="@string/refresh"
-            android:orderInCategory="2"
+            android:orderInCategory="1"
             android:icon="@drawable/ic_refresh_white_48dp"
             app:showAsAction="ifRoom"
             android:onClick="onStatisticsUpdate"/>

@@ -36,7 +36,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/dailyAmountLabel"
                     android:id="@+id/daily_amount_label"
-                    style="@style/mainInfoTextLabel"/>
+                    style="@style/mainInfoRightText"/>
 
             <TextView
                     android:layout_width="wrap_content"
@@ -72,7 +72,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/goalLabel"
                     android:id="@+id/goal_amount_label"
-                    style="@style/mainInfoTextLabel"/>
+                    style="@style/mainInfoRightText"/>
             <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -81,8 +81,7 @@
                     style="@style/mainInfoText"/>
         </LinearLayout>
     </TableRow>
-    <TableRow android:layout_width="match_parent" android:layout_height="wrap_content"
-              android:clickable="true" android:onClick="onStatisticsUpdate">
+    <TableRow android:layout_width="match_parent" android:layout_height="wrap_content">
         <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
@@ -107,7 +106,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/exchangeLabel"
                     android:id="@+id/exchange_amount_label"
-                    style="@style/mainInfoTextLabel"/>
+                    style="@style/mainInfoRightText"/>
             <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

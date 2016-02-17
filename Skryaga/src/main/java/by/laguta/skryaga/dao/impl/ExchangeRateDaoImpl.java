@@ -34,4 +34,13 @@ public class ExchangeRateDaoImpl extends OrmLiteBaseDAOImpl<ExchangeRate, Long>
 
         return exchangeRates.isEmpty() ? null : exchangeRates.get(0);
     }
+
+    @Override
+    public ExchangeRate getLastExchangeRate() throws SQLException {
+        QueryBuilder<ExchangeRate, Long> queryBuilder = queryBuilder();
+        queryBuilder.limit(1L).orderBy(ExchangeRate.RATE_DATE, false);
+        List<ExchangeRate> exchangeRates = query(queryBuilder.prepare());
+
+        return exchangeRates.isEmpty() ? null : exchangeRates.get(0);
+    }
 }

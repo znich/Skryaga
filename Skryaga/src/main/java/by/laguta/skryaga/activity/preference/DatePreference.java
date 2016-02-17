@@ -59,7 +59,7 @@ public class DatePreference extends DialogPreference {
 
     @Override
     protected Object onGetDefaultValue(TypedArray a, int index) {
-        return (a.getInt(index, 1));
+        return a.getInt(index, 1);
     }
 
     @Override

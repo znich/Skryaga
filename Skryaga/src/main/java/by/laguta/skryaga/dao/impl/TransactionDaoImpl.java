@@ -35,7 +35,7 @@ public class TransactionDaoImpl extends OrmLiteBaseDAOImpl<Transaction, Long>
     }
 
     @Override
-    public Double getTodaySpending() throws SQLException {
+    public BigDecimal getTodaySpending() throws SQLException {
         QueryBuilder<Transaction, Long> queryBuilder = queryBuilder();
         queryBuilder.where().gt(Transaction.MESSAGE_DATE, new DateTime().withTimeAtStartOfDay())
                 .and().eq(Transaction.TYPE, Transaction.Type.SPENDING);
@@ -45,12 +45,12 @@ public class TransactionDaoImpl extends OrmLiteBaseDAOImpl<Transaction, Long>
         return getSumAmount(transactions);
     }
 
-    private double getSumAmount(List<Transaction> transactions) {
+    private BigDecimal getSumAmount(List<Transaction> transactions) {
         BigDecimal result = new BigDecimal(0);
         for (Transaction transaction : transactions) {
             result = result.add(new BigDecimal(transaction.getAmount()));
         }
-        return result.doubleValue();
+        return result;
     }
 
     @Override
@@ -59,9 +59,11 @@ public class TransactionDaoImpl extends OrmLiteBaseDAOImpl<Transaction, Long>
 
         QueryBuilder<Transaction, Long> queryBuilder = queryBuilder();
         queryBuilder.where()
-                .ge(Transaction.MESSAGE_DATE, date)
+                .isNull(Transaction.GOAL_TRANSACTION)
                 .and()
-                .le(Transaction.MESSAGE_DATE, toDate)
+                .ge(Transaction.DATE_COLUMN, date)
+                .and()
+                .le(Transaction.DATE_COLUMN, toDate)
                 .and().eq(Transaction.TYPE, Transaction.Type.SPENDING);
         PreparedQuery<Transaction> preparedQuery = queryBuilder.prepare();
         return query(preparedQuery);
@@ -70,17 +72,31 @@ public class TransactionDaoImpl extends OrmLiteBaseDAOImpl<Transaction, Long>
     @Override
     public List<Transaction> getFirstDaySpendingTransactions() throws SQLException {
         QueryBuilder<Transaction, Long> queryBuilder = queryBuilder();
-        queryBuilder.where().eq(Transaction.TYPE, Transaction.Type.SPENDING);
-        queryBuilder.orderBy(Transaction.MESSAGE_DATE, true);
+        queryBuilder.where()
+                .eq(Transaction.TYPE, Transaction.Type.SPENDING)
+                .and()
+                .isNull(Transaction.GOAL_TRANSACTION);
+        queryBuilder.orderBy(Transaction.DATE_COLUMN, true);
+
         Transaction firstTransaction = queryBuilder.queryForFirst();
         if (firstTransaction != null) {
-            QueryBuilder<Transaction, Long> firstDayTransactions = queryBuilder();
-            firstDayTransactions.where().eq(Transaction.MESSAGE_DATE, firstTransaction.getDate())
-                    .and()
-                    .eq(Transaction.TYPE, Transaction.Type.SPENDING);
-            return query(firstDayTransactions.prepare());
+            DateTime start = firstTransaction.getDate().withTimeAtStartOfDay();
+            return getSpendingTransactionsBetween(start, start.plusDays(1));
         }
 
         return null;
+    }
+
+    @Override
+    public BigDecimal getIncomeAmount(DateTime date) throws SQLException {
+        DateTime start = date.withTimeAtStartOfDay();
+        DateTime end = start.plusDays(1);
+        QueryBuilder<Transaction, Long> queryBuilder = queryBuilder();
+        queryBuilder.where().ge(Transaction.DATE_COLUMN, start)
+                .and()
+                .lt(Transaction.DATE_COLUMN, end)
+                .and()
+                .eq(Transaction.TYPE, Transaction.Type.INCOME);
+        return getSumAmount(query(queryBuilder.prepare()));
     }
 }

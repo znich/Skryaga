@@ -21,6 +21,9 @@ public class UserSettings {
     @DatabaseField(canBeNull = false, columnName = "prepaidDate")
     private Integer prepaidDate;
 
+    @DatabaseField(canBeNull = false, columnName = "transactionsProcessed", defaultValue = "false")
+    private Boolean transactionsProcessed;
+
     public UserSettings() {
     }
 
@@ -28,6 +31,14 @@ public class UserSettings {
         this.id = id;
         this.salaryDate = salaryDate;
         this.prepaidDate = prepaidDate;
+    }
+
+    public UserSettings(
+            Long id, Integer salaryDate, Integer prepaidDate, Boolean transactionsProcessed) {
+        this.id = id;
+        this.salaryDate = salaryDate;
+        this.prepaidDate = prepaidDate;
+        this.transactionsProcessed = transactionsProcessed;
     }
 
     public Long getId() {
@@ -54,4 +65,43 @@ public class UserSettings {
         this.prepaidDate = prepaidDate;
     }
 
+    public Boolean isTransactionsProcessed() {
+        return transactionsProcessed;
+    }
+
+    public void setTransactionsProcessed(Boolean transactionsProcessed) {
+        this.transactionsProcessed = transactionsProcessed;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        UserSettings that = (UserSettings) o;
+
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        if (prepaidDate != null ? !prepaidDate.equals(that.prepaidDate) : that.prepaidDate != null)
+            return false;
+        if (salaryDate != null ? !salaryDate.equals(that.salaryDate) : that.salaryDate != null)
+            return false;
+
+        //noinspection RedundantIfStatement
+        if (transactionsProcessed != null
+                ? !transactionsProcessed.equals(that.transactionsProcessed)
+                : that.transactionsProcessed != null)
+            return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (salaryDate != null ? salaryDate.hashCode() : 0);
+        result = 31 * result + (prepaidDate != null ? prepaidDate.hashCode() : 0);
+        result = 31 * result
+                + (transactionsProcessed != null ? transactionsProcessed.hashCode() : 0);
+        return result;
+    }
 }

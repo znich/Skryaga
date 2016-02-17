@@ -59,6 +59,10 @@ public class Settings {
         return model.getPrepaidDate();
     }
 
+    public boolean isTransactionsProcessed() {
+        return model != null && model.isTransactionsProcessed();
+    }
+
     public UserSettings getModel() {
         return model;
     }

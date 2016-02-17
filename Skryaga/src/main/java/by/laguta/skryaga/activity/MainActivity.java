@@ -5,22 +5,23 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 import by.laguta.skryaga.R;
+import by.laguta.skryaga.activity.dialog.Progress;
+import by.laguta.skryaga.dao.model.Currency;
 import by.laguta.skryaga.dao.model.ExchangeRate;
 import by.laguta.skryaga.dao.model.UserSettings;
-import by.laguta.skryaga.service.CalculationService;
-import by.laguta.skryaga.service.ExchangeRateService;
-import by.laguta.skryaga.service.StatisticsService;
-import by.laguta.skryaga.service.UpdateExchangeRateListener;
-import by.laguta.skryaga.service.impl.SmsService;
+import by.laguta.skryaga.service.*;
+import by.laguta.skryaga.service.model.Goal;
 import by.laguta.skryaga.service.model.MainInfoModel;
 import by.laguta.skryaga.service.util.HelperFactory;
 import by.laguta.skryaga.service.util.Settings;
+import by.laguta.skryaga.service.util.UpdateTask;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -43,6 +44,8 @@ public class MainActivity extends Activity {
     private StatisticsService statisticsService = HelperFactory.getServiceHelper()
             .getStatisticsService();
 
+    private Progress progressDialog;
+
     private TextView totalAmountField;
     private TextView spentToday;
     private TextView exchangeRate;
@@ -50,6 +53,7 @@ public class MainActivity extends Activity {
     private TextView dailyAmount;
     private Toolbar toolbar;
     private TextView toolbarText;
+    private TextView goalAmount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +74,7 @@ public class MainActivity extends Activity {
         spentToday = (TextView) findViewById(R.id.spent_amount_field);
         restForToday = (TextView) findViewById(R.id.rest_amount_field);
         dailyAmount = (TextView) findViewById(R.id.daily_amount_field);
+        goalAmount = (TextView) findViewById(R.id.goal_amount_field);
         exchangeRate = (TextView) findViewById(R.id.exchange_amount_field);
     }
 
@@ -82,8 +87,8 @@ public class MainActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
-        if (SmsService.isUpdateComplete()) {
-            populateMainInfo();
+        if (Settings.getInstance().isTransactionsProcessed()) {
+            onStatisticsUpdate(null);
         }
     }
 
@@ -114,12 +119,17 @@ public class MainActivity extends Activity {
 
         dailyAmount.setText(formatCurrencyByr(mainInfoModel.getDailyAmount()));
 
+        Goal goal = mainInfoModel.getGoal();
+        double goalAmountValue = goal.getAmount().doubleValue();
+        String goalText = goal.getCurrencyType().equals(Currency.CurrencyType.BYR)
+                ? formatCurrencyByr(goalAmountValue) : formatCurrencyUsd(goalAmountValue);
+        goalAmount.setText(goalText);
+
         ExchangeRate lowestSellExchangeRate = exchangeRateService.getLowestExchangeRate(
                 new UpdateExchangeRateListener() {
                     @Override
-                    public void onExchangeRateUpdated(ExchangeRate exchangeRate) {
+                    public void onUpdated(ExchangeRate exchangeRate) {
                         populateExchangeRate(exchangeRate);
-
                     }
                 });
         populateExchangeRate(lowestSellExchangeRate);
@@ -133,11 +143,19 @@ public class MainActivity extends Activity {
     }
 
     private String formatCurrencyByr(Double totalAmount) {
+        return formatCurrency(totalAmount) + "р";
+    }
+
+    private String formatCurrencyUsd(Double totalAmount) {
+        return formatCurrency(totalAmount) + "$";
+    }
+
+    private String formatCurrency(Double totalAmount) {
         DecimalFormat formatter = (DecimalFormat) NumberFormat.getInstance(Locale.US);
         DecimalFormatSymbols symbols = formatter.getDecimalFormatSymbols();
         symbols.setGroupingSeparator(' ');
         formatter.setDecimalFormatSymbols(symbols);
-        return formatter.format(totalAmount) + "р";
+        return formatter.format(totalAmount);
     }
 
     public void showSettings(MenuItem item) {
@@ -152,16 +170,35 @@ public class MainActivity extends Activity {
         if (requestCode == SETTINGS_REQUEST_CODE) {
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(
                     this);
+            boolean transactionPrecessed = sharedPreferences.getBoolean(
+                    getStringResource(R.string.transactionsProcessed), false);
+
+            if (!transactionPrecessed) {
+                return;
+            }
 
             int salaryDate = sharedPreferences.getInt(getStringResource(R.string.salaryDate), 9);
             int prepaidDate = sharedPreferences.getInt(getStringResource(R.string.prepaidDate), 23);
+            UserSettings userSettings = new UserSettings(null, salaryDate, prepaidDate, true);
 
-            Settings.getInstance().updateSettings(new UserSettings(null, salaryDate, prepaidDate));
+            Settings settings = Settings.getInstance();
+            UserSettings currentModel = settings.getModel();
+            if (currentModel == null || !currentModel.equals(userSettings)) {
+                settings.updateSettings(userSettings);
+                populateMainInfo();
+            }
         }
     }
 
     public void onStatisticsUpdate(MenuItem item) {
-        statisticsService.updateStatistics();
+        //noinspection unchecked
+        new MainInfoUpdateTask().execute(new UpdateListener<Void>() {
+            @Override
+            public void onUpdated(Void model) {
+                populateMainInfo();
+                Looper.loop();
+            }
+        });
     }
 
     @Override
@@ -174,4 +211,21 @@ public class MainActivity extends Activity {
     private String getStringResource(int id) {
         return getApplicationContext().getResources().getString(id);
     }
-}
+
+    public void showProgress() {
+        if (progressDialog == null) {
+            progressDialog = new Progress(this, "Please wait", "", null);
+        }
+        progressDialog.show();
+    }
+
+    private class MainInfoUpdateTask extends UpdateTask<Void> {
+        @Override
+        protected Void performInBackground() {
+            Looper.prepare();
+            showProgress();
+            statisticsService.updateStatistics();
+            return null;
+        }
+    }
+ }

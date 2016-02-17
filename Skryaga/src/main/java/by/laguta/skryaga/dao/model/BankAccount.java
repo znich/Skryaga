@@ -14,7 +14,7 @@ import com.j256.ormlite.table.DatabaseTable;
 public class BankAccount {
 
     @DatabaseField(generatedId = true)
-    private long id;
+    private Long id;
 
     public static final String PHONE_NUMBER = "phoneNumber";
     @DatabaseField(canBeNull = false, width = 3000, columnName = PHONE_NUMBER)
@@ -26,11 +26,17 @@ public class BankAccount {
     public BankAccount() {
     }
 
-    public long getId() {
+    public BankAccount(Long id, String phoneNumber, String label) {
+        this.id = id;
+        this.phoneNumber = phoneNumber;
+        this.label = label;
+    }
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

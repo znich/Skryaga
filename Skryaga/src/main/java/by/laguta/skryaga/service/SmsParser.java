@@ -1,6 +1,7 @@
 package by.laguta.skryaga.service;
 
 import by.laguta.skryaga.dao.model.Transaction;
+import org.joda.time.DateTime;
 
 import java.text.ParseException;
 
@@ -13,5 +14,5 @@ import java.text.ParseException;
  */
 public interface SmsParser {
 
-    Transaction parseToTransaction(String message) throws ParseException;
+    Transaction parseToTransaction(String message, DateTime defaultDate) throws ParseException;
 }

@@ -234,7 +234,7 @@ public class SmsParserImplTest extends TestCase {
     }
 
     private void checkParseSms(String sms, Transaction expected) throws ParseException {
-        Transaction actual = smsParser.parseToTransaction(sms);
+        Transaction actual = smsParser.parseToTransaction(sms, new DateTime());
         assertEquals(expected, actual);
     }
 }

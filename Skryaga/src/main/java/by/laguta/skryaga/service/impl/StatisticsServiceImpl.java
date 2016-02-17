@@ -56,9 +56,9 @@ public class StatisticsServiceImpl implements StatisticsService {
 
                 double median = new Median().evaluate(amountArray);
 
-                double average = new Mean().evaluate(amountArray);
+                double average = roundAmount(new Mean().evaluate(amountArray));
 
-                double relative = new Mean().evaluate(new double[]{average, median});
+                double relative = roundAmount(new Mean().evaluate(new double[]{average, median}));
 
                 SpendingStatistics spendingStatistics = new SpendingStatistics(
                         null, lastStatisticsDate, median, average, relative);
@@ -77,6 +77,10 @@ public class StatisticsServiceImpl implements StatisticsService {
         } catch (SQLException e) {
             Log.e(TAG, "Error updating statistics", e);
         }
+    }
+
+    private double roundAmount(double amount) {
+        return new BigDecimal(amount).setScale(2, BigDecimal.ROUND_HALF_DOWN).doubleValue();
     }
 
     private double[] calculateAmounts(List<Transaction> transactions) {

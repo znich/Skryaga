@@ -1,6 +1,7 @@
 package by.laguta.skryaga.dao;
 
 import by.laguta.skryaga.dao.model.BankAccount;
+import com.j256.ormlite.dao.Dao;
 
 import java.sql.SQLException;
 
@@ -11,7 +12,7 @@ import java.sql.SQLException;
  *
  * @author Anatoly
  */
-public interface BankAccountDao {
+public interface BankAccountDao extends Dao<BankAccount, Long> {
 
     BankAccount getByNumber(String number) throws SQLException;
 }

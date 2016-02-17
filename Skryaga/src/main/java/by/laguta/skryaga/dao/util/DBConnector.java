@@ -3,6 +3,7 @@ package by.laguta.skryaga.dao.util;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+import by.laguta.skryaga.R;
 import by.laguta.skryaga.dao.*;
 import by.laguta.skryaga.dao.impl.*;
 import by.laguta.skryaga.dao.model.*;
@@ -29,6 +30,8 @@ public class DBConnector extends OrmLiteSqliteOpenHelper {
     //с каждым увеличением версии, при нахождении в устройстве БД с предыдущей версией будет выполнен метод onUpgrade();
     private static final int DATABASE_VERSION = 1;
 
+    private Context context;
+
     private TransactionDao transactionDao;
     private BankAccountDao bankAccountDao;
     private CurrencyDAOImpl currencyDAO;
@@ -39,6 +42,7 @@ public class DBConnector extends OrmLiteSqliteOpenHelper {
 
     public DBConnector(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        this.context = context;
     }
 
     @Override
@@ -52,6 +56,9 @@ public class DBConnector extends OrmLiteSqliteOpenHelper {
             TableUtils.createTable(connectionSource, ExchangeRate.class);
             TableUtils.createTable(connectionSource, GoalTransaction.class);
             TableUtils.createTable(connectionSource, UserSettings.class);
+
+            getBankAccountDao().create(
+                    new BankAccount(null, context.getString(R.string.bank_accounts), ""));
         } catch (SQLException e) {
             Log.e(TAG, "error creating DB " + DATABASE_NAME);
             throw new RuntimeException(e);

@@ -61,7 +61,8 @@ public class Transaction {
     @DatabaseField(canBeNull = false, dataType = DataType.ENUM_STRING, columnName = "currencyType")
     private CurrencyType currencyType;
 
-    @DatabaseField(canBeNull = false, dataType = DataType.DATE_TIME, columnName = "date")
+    public static final String DATE_COLUMN = "date";
+    @DatabaseField(canBeNull = false, dataType = DataType.DATE_TIME, columnName = DATE_COLUMN)
     private DateTime date;
 
     @DatabaseField(canBeNull = false, columnName = "amount")
@@ -86,7 +87,8 @@ public class Transaction {
     @DatabaseField(canBeNull = true, foreign = true, columnName = "balance")
     private Balance balance;
 
-    @DatabaseField(canBeNull = true, foreign = true, columnName = "goal_transaction")
+    public static final String GOAL_TRANSACTION = "goal_transaction";
+    @DatabaseField(canBeNull = true, foreign = true, columnName = GOAL_TRANSACTION)
     private GoalTransaction goalTransaction;
 
     public Transaction() {
@@ -94,7 +96,7 @@ public class Transaction {
 
     public Transaction(
             Long id,
-            DateTime messageId,
+            DateTime messageDate,
             BankAccount bankAccount,
             String cardNumber,
             CurrencyType currency,
@@ -103,13 +105,13 @@ public class Transaction {
             String message,
             boolean accumulation,
             boolean approved) {
-        this(id, messageId, bankAccount, cardNumber, currency, date, amount, type, message, null,
+        this(id, messageDate, bankAccount, cardNumber, currency, date, amount, type, message, null,
                 accumulation, approved, null);
     }
 
     public Transaction(
             Long id,
-            DateTime messageId,
+            DateTime messageDate,
             BankAccount bankAccount,
             String cardNumber,
             CurrencyType currency,
@@ -122,7 +124,7 @@ public class Transaction {
             boolean approved,
             Balance balance) {
         this.id = id;
-        this.messageDate = messageId;
+        this.messageDate = messageDate;
         this.bankAccount = bankAccount;
         this.cardNumber = cardNumber;
         this.currencyType = currency;
@@ -269,7 +271,7 @@ public class Transaction {
         if (goalTransaction != null ? !goalTransaction.equals(that.goalTransaction)
                 : that.goalTransaction != null)
             return false;
-        if (!id.equals(that.id)) return false;
+        if (id != null ? !id.equals(that.id) : that.id != null)return false;
         if (message != null ? !message.equals(that.message) : that.message != null) return false;
         if (messageDate != null ? !messageDate.equals(that.messageDate) : that.messageDate != null)
             return false;

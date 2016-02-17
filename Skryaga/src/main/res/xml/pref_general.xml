@@ -12,11 +12,10 @@
             android:title="@string/selectPrepaidDate"
             android:defaultValue="23"/>
 
-    <CheckBoxPreference
-        android:key="111"
-        android:title="@string/pref_title_social_recommendations"
-        android:summary="@string/pref_description_social_recommendations"
-        android:defaultValue="true" />
+    <by.laguta.skryaga.activity.preference.TransactionsUpdatePreference
+            android:title="@string/updatePreference"
+            android:key="@string/transactionsProcessed"
+            android:defaultValue="false"/>
 
 
     <!-- NOTE: EditTextPreference accepts EditText attributes. -->

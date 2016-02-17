@@ -30,7 +30,6 @@ import java.sql.SQLException;
  */
 public class CalculationServiceImpl implements CalculationService {
     private static final String TAG = CalculationServiceImpl.class.getName();
-    private static final int AVG_MOTH_COUNT = 3;
 
     private TransactionDao transactionDao;
     private BalanceDao balanceDao;
@@ -90,7 +89,7 @@ public class CalculationServiceImpl implements CalculationService {
     public Double getTodaySpending() {
         Double amount = 0d;
         try {
-            amount = transactionDao.getTodaySpending();
+            amount = transactionDao.getTodaySpending().doubleValue();
         } catch (SQLException e) {
             Log.e(TAG, "Error getting spent for today", e);
         }
@@ -124,7 +123,7 @@ public class CalculationServiceImpl implements CalculationService {
             if (exchangeRate != null) {
                 BigDecimal amount = byrGoal.divide(
                         new BigDecimal(exchangeRate.getSellingRate()),
-                        2,
+                        0,
                         BigDecimal.ROUND_HALF_DOWN);
                 goal = new Goal(amount, Currency.CurrencyType.USD);
             } else {
@@ -139,7 +138,7 @@ public class CalculationServiceImpl implements CalculationService {
 
     private long getDaysBeforePrepaid() {
         DateTime today = new DateTime().withTimeAtStartOfDay();
-        return new Duration(today, getPrepaidDate()).getStandardDays();
+        return new Duration(today, getNextPrepaidDate()).getStandardDays();
     }
 
     private Long getDaysBeforeSalary() {
@@ -150,15 +149,47 @@ public class CalculationServiceImpl implements CalculationService {
     }
 
     private DateTime getNextSalaryDate() {
-        //TODO: AL calculate date according on salary date from settings and holidays
         Integer salaryDate = Settings.getInstance().getSalaryDate();
-        return new DateTime().withDayOfMonth(salaryDate);
+        return calculateIncomeDate(new DateTime().withTimeAtStartOfDay(), salaryDate);
+    }
+
+    private DateTime calculateIncomeDate(DateTime start, Integer incomeDayOfMonth) {
+        DateTime startWithIncomeDate = start.withDayOfMonth(incomeDayOfMonth);
+        DateTime result = startWithIncomeDate.isBefore(start)
+                ? startWithIncomeDate.plusMonths(1) : startWithIncomeDate;
+        return checkHolidays(result);
+    }
+
+    private DateTime checkHolidays(DateTime date) {
+        int dayOfWeek = date.getDayOfWeek();
+        int correctionDays;
+        switch (dayOfWeek) {
+            case 6:
+                correctionDays = 1;
+                break;
+            case 7:
+                correctionDays = 2;
+                break;
+            default:
+                correctionDays = 0;
+                break;
+        }
+        return date.minusDays(correctionDays);
+    }
+
+    private DateTime getNextPrepaidDate() {
+        return getPrepaidDate(new DateTime().withTimeAtStartOfDay());
+    }
+
+    private DateTime getPrepaidDate(DateTime month) {
+        Integer prepaidDate = Settings.getInstance().getPrepaidDate();
+        return calculateIncomeDate(month, prepaidDate);
     }
 
     private BigDecimal getPrepaidShortage(SpendingStatistics spendingStatistics) {
         DateTime salaryDate = getNextSalaryDate();
 
-        long prepaidToSalaryDays = new Duration(getPrepaidDate(), salaryDate).getStandardDays();
+        long prepaidToSalaryDays = new Duration(getNextPrepaidDate(), salaryDate).getStandardDays();
 
         BigDecimal prepaid = getPrepaidAmount();
         double relative = spendingStatistics.getRelative();
@@ -178,17 +209,19 @@ public class CalculationServiceImpl implements CalculationService {
         //TODO: AL  check when today is salary or prepaid date
         DateTime today = new DateTime().withTimeAtStartOfDay();
         Interval interval = new Interval(today, getNextSalaryDate());
-        return interval.contains(getPrepaidDate());
+        return interval.contains(getNextPrepaidDate());
     }
 
     private BigDecimal getPrepaidAmount() {
-        //TODO: AL get last prepaid amount
-        return new BigDecimal(0d);
+        BigDecimal prepaidAmount = new BigDecimal(0);
+        try {
+            DateTime prepaidDate = getPrepaidDate(
+                    new DateTime().withDayOfMonth(1).withTimeAtStartOfDay().minusMonths(1));
+            prepaidAmount = transactionDao.getIncomeAmount(prepaidDate);
+        } catch (SQLException e) {
+            Log.e(TAG, "Error getting prepaid amount", e);
+        }
+        return prepaidAmount;
     }
 
-    private DateTime getPrepaidDate() {
-        //TODO: AL  get prepaid date from settings
-        Integer prepaidDate = Settings.getInstance().getPrepaidDate();
-        return new DateTime().withDayOfMonth(prepaidDate);
-    }
 }

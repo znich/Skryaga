@@ -16,4 +16,6 @@ import java.sql.SQLException;
 public interface ExchangeRateDao extends Dao<ExchangeRate, Long> {
 
     ExchangeRate getExchangeRate(DateTime date) throws SQLException;
+
+    ExchangeRate getLastExchangeRate() throws SQLException;
 }

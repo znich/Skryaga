@@ -16,7 +16,8 @@ import java.util.List;
  *
  * @author Anatoly
  */
-public class BankAccountDaoImpl extends OrmLiteBaseDAOImpl<BankAccount, Long> implements BankAccountDao {
+public class BankAccountDaoImpl extends OrmLiteBaseDAOImpl<BankAccount, Long>
+        implements BankAccountDao {
 
 
     public BankAccountDaoImpl(ConnectionSource connectionSource) throws SQLException {

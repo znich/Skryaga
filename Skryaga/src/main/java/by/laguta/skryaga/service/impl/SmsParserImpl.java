@@ -86,24 +86,25 @@ public class SmsParserImpl implements SmsParser {
         return null;
     }
 
-    public Transaction parseToTransaction(String message) throws ParseException {
+    public Transaction parseToTransaction(String message, DateTime defaultDate) throws ParseException {
         Matcher matcher = Pattern.compile(SMS_REGEXP).matcher(message);
         if (matcher.find()) {
-            return getCommonTransaction(matcher);
+            return getCommonTransaction(matcher, defaultDate);
         }
         matcher = Pattern.compile(SMS_REGEXP_NO_DESCRIPTION).matcher(message);
         if (matcher.find()) {
-            return getTransactionWithoutDescription(matcher);
+            return getTransactionWithoutDescription(matcher, defaultDate);
         }
         matcher = Pattern.compile(SMS_REGEXP_PAYMENT).matcher(message);
         if (matcher.find()) {
-            return getPaymentTransaction(matcher);
+            return getPaymentTransaction(matcher, defaultDate);
         }
-        return null;
+        throw new ParseException("Could not parse message : \n" + message, 0);
     }
 
-    private Transaction getCommonTransaction(Matcher matcher) throws ParseException {
-        DateTime dateTime = getDateTime(matcher);
+    private Transaction getCommonTransaction(Matcher matcher, DateTime defaultDate)
+            throws ParseException {
+        DateTime dateTime = getDateTime(matcher, defaultDate);
         Balance balance = getBalance(matcher, dateTime, 9);
         Transaction transaction = new Transaction(
                 null,
@@ -121,8 +122,8 @@ public class SmsParserImpl implements SmsParser {
         return transaction;
     }
 
-    private Transaction getTransactionWithoutDescription(Matcher matcher) throws ParseException {
-        DateTime dateTime = getDateTime(matcher);
+    private Transaction getTransactionWithoutDescription(Matcher matcher, DateTime defaultDate) throws ParseException {
+        DateTime dateTime = getDateTime(matcher, defaultDate);
         Balance balance = getBalance(matcher, dateTime, 8);
         Transaction transaction = new Transaction(
                 null,
@@ -140,13 +141,13 @@ public class SmsParserImpl implements SmsParser {
         return transaction;
     }
 
-    private Transaction getPaymentTransaction(Matcher matcher) {
+    private Transaction getPaymentTransaction(Matcher matcher, DateTime date) {
         return new Transaction(
                 null,
                 null, null,
                 getCard(matcher),
                 getCurrencyType(matcher, 4),
-                null,
+                date,
                 getAmount(matcher, 3),
                 Type.SPENDING,
                 matcher.group(2),
@@ -158,10 +159,10 @@ public class SmsParserImpl implements SmsParser {
         return matcher.group(1);
     }
 
-    private DateTime getDateTime(Matcher matcher) throws ParseException {
+    private DateTime getDateTime(Matcher matcher, DateTime defaultDate) throws ParseException {
         String dateTimeString = matcher.group(2) + " " + matcher.group(3);
         Date date = dateFormat.parse(dateTimeString);
-        return new DateTime(date);
+        return date != null ? new DateTime(date) : defaultDate;
     }
 
     private Type getOperationType(Matcher matcher) {
@@ -170,7 +171,7 @@ public class SmsParserImpl implements SmsParser {
     }
 
     private Double getAmount(Matcher matcher, int group) {
-        return Double.valueOf(matcher.group(group));
+        return Math.abs(Double.valueOf(matcher.group(group)));
     }
 
     private CurrencyType getCurrencyType(Matcher matcher, int group) {

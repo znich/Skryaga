@@ -1,7 +1,6 @@
 package by.laguta.skryaga.service.impl;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.util.Log;
 import by.laguta.skryaga.R;
 import by.laguta.skryaga.dao.ExchangeRateDao;
@@ -10,6 +9,7 @@ import by.laguta.skryaga.dao.model.ExchangeRate;
 import by.laguta.skryaga.service.ExchangeRateService;
 import by.laguta.skryaga.service.UpdateExchangeRateListener;
 import by.laguta.skryaga.service.util.HelperFactory;
+import by.laguta.skryaga.service.util.UpdateTask;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.jsoup.Jsoup;
@@ -56,9 +56,9 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
     public ExchangeRate getSavedLowestSellExchangeRate() {
         ExchangeRate exchangeRate = null;
         try {
-            exchangeRate = exchangeRateDao.getExchangeRate(new DateTime().withTimeAtStartOfDay());
+            exchangeRate = exchangeRateDao.getLastExchangeRate();
         } catch (SQLException e) {
-            Log.e(TAG, "Error getting lowest selling rate");
+            Log.e(TAG, "Error getting lowest selling rate", e);
         }
 
         return exchangeRate;
@@ -152,13 +152,10 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
         this.updateInterval = updateInterval;
     }
 
-    private class UpdateRatesTask extends AsyncTask<UpdateExchangeRateListener, Integer, ExchangeRate> {
+    private class UpdateRatesTask extends UpdateTask<ExchangeRate> {
 
-        private UpdateExchangeRateListener[] listeners = new UpdateExchangeRateListener[0];
-
-        protected ExchangeRate doInBackground(UpdateExchangeRateListener... listeners) {
-            this.listeners = listeners;
-
+        @Override
+        protected ExchangeRate performInBackground() {
             if (lastUpdated != null) {
                 long minutes = new Duration(lastUpdated, new DateTime()).getStandardMinutes();
                 if (minutes <= updateInterval) {
@@ -168,21 +165,14 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
             ExchangeRate lowestRate = getLowestRate();
             saveOrUpdateLowestExchangeRate(lowestRate);
             lastUpdated = new DateTime();
-
             return lowestRate;
         }
 
-        ExchangeRate getLowestRate() {
+        private ExchangeRate getLowestRate() {
             Set<ExchangeRate> exchangeRates = getExchangeRates();
-
             return Collections.min(exchangeRates);
         }
 
-        protected void onPostExecute(ExchangeRate result) {
-            for (UpdateExchangeRateListener listener : listeners) {
-                listener.onExchangeRateUpdated(result);
-            }
-        }
     }
 
 }

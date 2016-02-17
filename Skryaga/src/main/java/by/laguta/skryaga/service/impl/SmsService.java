@@ -8,13 +8,15 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 import by.laguta.skryaga.R;
+import by.laguta.skryaga.dao.BalanceDao;
 import by.laguta.skryaga.dao.BankAccountDao;
 import by.laguta.skryaga.dao.TransactionDao;
 import by.laguta.skryaga.dao.model.BankAccount;
 import by.laguta.skryaga.dao.model.Transaction;
-import by.laguta.skryaga.service.util.HelperFactory;
 import by.laguta.skryaga.service.ISkryaga;
 import by.laguta.skryaga.service.SmsParser;
+import by.laguta.skryaga.service.util.HelperFactory;
+import by.laguta.skryaga.service.util.Settings;
 import org.joda.time.DateTime;
 
 import java.sql.SQLException;
@@ -41,6 +43,7 @@ public class SmsService extends Service {
     private SmsParser smsParser;
     private BankAccountDao bankAccountDao;
     private TransactionDao transactionDao;
+    private BalanceDao balanceDao;
     private static final Uri SMS_INBOX_CONTENT_URI = Uri.parse("content://sms/inbox");
 
     @Override
@@ -65,29 +68,34 @@ public class SmsService extends Service {
         smsParser = HelperFactory.getServiceHelper().getSmsParser();
         bankAccountDao = HelperFactory.getDaoHelper().getBankAccountDao();
         transactionDao = HelperFactory.getDaoHelper().getTransactionDao();
+        balanceDao = HelperFactory.getDaoHelper().getBalanceDao();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        String smsSender = intent.getExtras().getString(SMS_SENDER);
-        String smsBody = intent.getExtras().getString(SMS_BODY);
-        Long smsDate = intent.getExtras().getLong(SMS_TIMESTAMP);
-        saveTransaction(smsSender, smsBody, smsDate);
-
+        if (Settings.getInstance().isTransactionsProcessed() && intent != null) {
+            String smsSender = intent.getExtras().getString(SMS_SENDER);
+            String smsBody = intent.getExtras().getString(SMS_BODY);
+            Long smsDate = intent.getExtras().getLong(SMS_TIMESTAMP);
+            saveTransaction(smsSender, smsBody, smsDate);
+        }
         return START_STICKY;
     }
 
     private void saveTransaction(String smsSender, String smsBody, Long smsDate) {
         try {
-            Transaction transaction = smsParser.parseToTransaction(smsBody);
+            DateTime messageDate = new DateTime(new Date(smsDate));
+            Transaction transaction = smsParser.parseToTransaction(smsBody, messageDate);
             BankAccount bankAccount = bankAccountDao.getByNumber(smsSender);
             transaction.setBankAccount(bankAccount);
-            transaction.setMessageDate(new DateTime(new Date(smsDate)));
+            transaction.setMessageDate(messageDate);
+            balanceDao.create(transaction.getBalance());
             transactionDao.create(transaction);
         } catch (ParseException e) {
-            Log.e(TAG, "Error parsing message: " + smsBody, e);
+            Log.e(TAG, "Error parsing message: \n" + smsBody);
         } catch (SQLException e) {
-            Log.e(TAG, "Error getting bank account for sender " + smsSender, e);
+            Log.d(TAG, "Error saving transaction from message:\n" + smsBody);
+            Log.e(TAG, "Error saving transaction " + smsSender, e);
         }
     }
 

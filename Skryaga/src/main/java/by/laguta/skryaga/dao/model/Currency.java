@@ -20,7 +20,8 @@ public class Currency {
     public static enum CurrencyType {
         BYR("BYR", "BLR"),
         USD("USD"),
-        EUR;
+        RUB("RUB"),
+        EUR("EUR");
 
         private List<String> values;
 
