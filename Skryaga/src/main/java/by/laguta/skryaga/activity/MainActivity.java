@@ -44,8 +44,6 @@ public class MainActivity extends Activity {
     private StatisticsService statisticsService = HelperFactory.getServiceHelper()
             .getStatisticsService();
 
-    private Progress progressDialog;
-
     private TextView totalAmountField;
     private TextView spentToday;
     private TextView exchangeRate;
@@ -80,7 +78,7 @@ public class MainActivity extends Activity {
 
     private void initToolbar() {
         toolbar.inflateMenu(R.menu.menu_main);
-        Typeface tf = Typeface.createFromAsset(getAssets(), getStringResource(R.string.fontArial));
+        Typeface tf = Typeface.createFromAsset(getAssets(), getString(R.string.fontArial));
         toolbarText.setTypeface(tf);
     }
 
@@ -95,7 +93,6 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-
         checkFirstStart();
     }
 
@@ -171,14 +168,14 @@ public class MainActivity extends Activity {
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(
                     this);
             boolean transactionPrecessed = sharedPreferences.getBoolean(
-                    getStringResource(R.string.transactionsProcessed), false);
+                    getString(R.string.transactionsProcessed), false);
 
             if (!transactionPrecessed) {
                 return;
             }
 
-            int salaryDate = sharedPreferences.getInt(getStringResource(R.string.salaryDate), 9);
-            int prepaidDate = sharedPreferences.getInt(getStringResource(R.string.prepaidDate), 23);
+            int salaryDate = sharedPreferences.getInt(getString(R.string.salaryDate), 9);
+            int prepaidDate = sharedPreferences.getInt(getString(R.string.prepaidDate), 23);
             UserSettings userSettings = new UserSettings(null, salaryDate, prepaidDate, true);
 
             Settings settings = Settings.getInstance();
@@ -192,11 +189,10 @@ public class MainActivity extends Activity {
 
     public void onStatisticsUpdate(MenuItem item) {
         //noinspection unchecked
-        new MainInfoUpdateTask().execute(new UpdateListener<Void>() {
+        new MainInfoUpdateTask(this).execute(new UpdateListener<Void>() {
             @Override
             public void onUpdated(Void model) {
                 populateMainInfo();
-                Looper.loop();
             }
         });
     }
@@ -208,24 +204,36 @@ public class MainActivity extends Activity {
         return true;
     }
 
-    private String getStringResource(int id) {
-        return getApplicationContext().getResources().getString(id);
-    }
-
-    public void showProgress() {
-        if (progressDialog == null) {
-            progressDialog = new Progress(this, "Please wait", "", null);
-        }
-        progressDialog.show();
-    }
-
     private class MainInfoUpdateTask extends UpdateTask<Void> {
+
+        private Progress dialog;
+
+        public MainInfoUpdateTask(Activity activity) {
+            this.dialog = new Progress(
+                    activity,
+                    getString(R.string.progressTitle),
+                    getString(R.string.statisticsUpdating),
+                    null);
+        }
+
         @Override
         protected Void performInBackground() {
             Looper.prepare();
-            showProgress();
             statisticsService.updateStatistics();
             return null;
         }
+
+        protected void onPreExecute() {
+            dialog.show();
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+                Looper.loop();
+            }
+        }
     }
- }
+}
