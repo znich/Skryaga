@@ -1,8 +1,10 @@
 package by.laguta.skryaga.service.impl;
 
 import android.util.Log;
+import by.laguta.skryaga.dao.BalanceDao;
 import by.laguta.skryaga.dao.SpendingStatisticsDao;
 import by.laguta.skryaga.dao.TransactionDao;
+import by.laguta.skryaga.dao.model.Balance;
 import by.laguta.skryaga.dao.model.SpendingStatistics;
 import by.laguta.skryaga.dao.model.Transaction;
 import by.laguta.skryaga.service.StatisticsService;
@@ -32,6 +34,8 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     private SpendingStatisticsDao spendingStatisticsDao = HelperFactory.getDaoHelper()
             .getSpendingStatisticsDao();
+
+    private BalanceDao balanceDao = HelperFactory.getDaoHelper().getBalanceDao();
 
 
     @Override
@@ -83,7 +87,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         return new BigDecimal(amount).setScale(2, BigDecimal.ROUND_HALF_DOWN).doubleValue();
     }
 
-    private double[] calculateAmounts(List<Transaction> transactions) {
+    private double[] calculateAmounts(List<Transaction> transactions) throws SQLException {
         HashMap<DateTime, BigDecimal> spendingMap = new HashMap<DateTime, BigDecimal>();
         for (Transaction transaction : transactions) {
             DateTime date = transaction.getDate().withTimeAtStartOfDay();
@@ -91,7 +95,7 @@ public class StatisticsServiceImpl implements StatisticsService {
             if (amount == null) {
                 amount = new BigDecimal(0d);
             }
-            amount = amount.add(new BigDecimal(transaction.getAmount()));
+            amount = amount.add(getTransactionAmount(transaction));
             spendingMap.put(date, amount);
         }
 
@@ -120,16 +124,15 @@ public class StatisticsServiceImpl implements StatisticsService {
         return lastStatisticsDate;
     }
 
-    private DateTime saveFirstStatistics(
-            List<Transaction> firstDaySpendingTransactions) throws SQLException {
+    private DateTime saveFirstStatistics(List<Transaction> firstDaySpendingTransactions)
+            throws SQLException {
 
         DateTime lastStatisticsDate = firstDaySpendingTransactions.iterator()
                 .next().getDate().withTimeAtStartOfDay();
 
         BigDecimal totalAmount = new BigDecimal(0d);
         for (Transaction transaction : firstDaySpendingTransactions) {
-            double amount = transaction.getAmount();
-            totalAmount = totalAmount.add(new BigDecimal(amount));
+            totalAmount = totalAmount.add(getTransactionAmount(transaction));
         }
 
         double totalDouble = totalAmount.doubleValue();
@@ -142,6 +145,20 @@ public class StatisticsServiceImpl implements StatisticsService {
 
         spendingStatisticsDao.create(spendingStatistics);
         return lastStatisticsDate;
+    }
+
+    private BigDecimal getTransactionAmount(Transaction transaction) throws SQLException {
+        return transaction.isByrCurrency()
+                ? new BigDecimal(transaction.getAmount())
+                : getAmountForForeignCurrency(transaction);
+    }
+
+    private BigDecimal getAmountForForeignCurrency(Transaction transaction) throws SQLException {
+        Long balanceId = transaction.getBalance().getId();
+        Balance currentBalance = balanceDao.queryForId(balanceId);
+        Balance prevBalance = balanceDao.getPreviousBalance(balanceId);
+        return new BigDecimal(prevBalance.getAmount())
+                .add(new BigDecimal(currentBalance.getAmount()).negate());
     }
 
 }

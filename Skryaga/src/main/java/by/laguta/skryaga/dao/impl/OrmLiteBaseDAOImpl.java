@@ -14,6 +14,8 @@ import java.sql.SQLException;
  */
 public abstract class OrmLiteBaseDAOImpl<T, ID> extends BaseDaoImpl<T, ID> {
 
+    public static final String ID = "id";
+
     public OrmLiteBaseDAOImpl(ConnectionSource connectionSource, Class<T> dataClass)
             throws SQLException {
         super(connectionSource, dataClass);

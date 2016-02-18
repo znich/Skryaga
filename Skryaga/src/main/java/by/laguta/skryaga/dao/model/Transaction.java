@@ -81,7 +81,8 @@ public class Transaction {
     @DatabaseField(canBeNull = false, defaultValue = "false", columnName = "accumulation")
     private boolean accumulation;
 
-    @DatabaseField(canBeNull = false, defaultValue = "false", columnName = "approved")
+    public static final String APPROVED_COLUMN = "approved";
+    @DatabaseField(canBeNull = false, defaultValue = "false", columnName = APPROVED_COLUMN)
     private boolean approved;
 
     @DatabaseField(canBeNull = true, foreign = true, columnName = "balance")
@@ -136,6 +137,10 @@ public class Transaction {
         this.accumulation = accumulation;
         this.approved = approved;
         this.balance = balance;
+    }
+
+    public boolean isByrCurrency() {
+        return CurrencyType.BYR.equals(getCurrencyType());
     }
 
     public Long getId() {

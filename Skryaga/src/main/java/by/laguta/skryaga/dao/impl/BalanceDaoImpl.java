@@ -26,4 +26,13 @@ public class BalanceDaoImpl extends OrmLiteBaseDAOImpl<Balance, Long> implements
         List<Balance> query = query(queryBuilder.prepare());
         return query.isEmpty() ? null : query.get(0);
     }
+
+    @Override
+    public Balance getPreviousBalance(Long balanceId) throws SQLException {
+        QueryBuilder<Balance, Long> queryBuilder = queryBuilder();
+        queryBuilder.where().lt(ID, balanceId);
+        queryBuilder.orderBy(ID, false);
+        queryBuilder.limit(1L);
+        return queryForFirst(queryBuilder.prepare());
+    }
 }

@@ -38,7 +38,6 @@ public class CalculationServiceImpl implements CalculationService {
 
     public CalculationServiceImpl() {
         initializeServices();
-
     }
 
     private void initializeServices() {
@@ -215,9 +214,12 @@ public class CalculationServiceImpl implements CalculationService {
     private BigDecimal getPrepaidAmount() {
         BigDecimal prepaidAmount = new BigDecimal(0);
         try {
-            DateTime prepaidDate = getPrepaidDate(
-                    new DateTime().withDayOfMonth(1).withTimeAtStartOfDay().minusMonths(1));
-            prepaidAmount = transactionDao.getIncomeAmount(prepaidDate);
+            DateTime month = new DateTime().withDayOfMonth(1).withTimeAtStartOfDay().minusMonths(1);
+            DateTime prepaidDate = getPrepaidDate(month);
+            while (prepaidAmount.doubleValue() == 0d) {
+                prepaidAmount = transactionDao.getIncomeAmount(prepaidDate);
+                prepaidDate.minusDays(1);
+            }
         } catch (SQLException e) {
             Log.e(TAG, "Error getting prepaid amount", e);
         }

@@ -38,7 +38,9 @@ public class TransactionDaoImpl extends OrmLiteBaseDAOImpl<Transaction, Long>
     public BigDecimal getTodaySpending() throws SQLException {
         QueryBuilder<Transaction, Long> queryBuilder = queryBuilder();
         queryBuilder.where().gt(Transaction.MESSAGE_DATE, new DateTime().withTimeAtStartOfDay())
-                .and().eq(Transaction.TYPE, Transaction.Type.SPENDING);
+                .and().eq(Transaction.TYPE, Transaction.Type.SPENDING)
+                .and().eq(Transaction.APPROVED_COLUMN, true);
+        ;
         PreparedQuery<Transaction> preparedQuery = queryBuilder.prepare();
         List<Transaction> transactions = query(preparedQuery);
 
@@ -64,7 +66,10 @@ public class TransactionDaoImpl extends OrmLiteBaseDAOImpl<Transaction, Long>
                 .ge(Transaction.DATE_COLUMN, date)
                 .and()
                 .le(Transaction.DATE_COLUMN, toDate)
-                .and().eq(Transaction.TYPE, Transaction.Type.SPENDING);
+                .and()
+                .eq(Transaction.TYPE, Transaction.Type.SPENDING)
+                .and()
+                .eq(Transaction.APPROVED_COLUMN, true);
         PreparedQuery<Transaction> preparedQuery = queryBuilder.prepare();
         return query(preparedQuery);
     }
@@ -75,7 +80,9 @@ public class TransactionDaoImpl extends OrmLiteBaseDAOImpl<Transaction, Long>
         queryBuilder.where()
                 .eq(Transaction.TYPE, Transaction.Type.SPENDING)
                 .and()
-                .isNull(Transaction.GOAL_TRANSACTION);
+                .isNull(Transaction.GOAL_TRANSACTION)
+                .and()
+                .eq(Transaction.APPROVED_COLUMN, true);
         queryBuilder.orderBy(Transaction.DATE_COLUMN, true);
 
         Transaction firstTransaction = queryBuilder.queryForFirst();
@@ -96,7 +103,10 @@ public class TransactionDaoImpl extends OrmLiteBaseDAOImpl<Transaction, Long>
                 .and()
                 .lt(Transaction.DATE_COLUMN, end)
                 .and()
-                .eq(Transaction.TYPE, Transaction.Type.INCOME);
+                .eq(Transaction.TYPE, Transaction.Type.INCOME)
+                .and()
+                .eq(Transaction.APPROVED_COLUMN, true);
         return getSumAmount(query(queryBuilder.prepare()));
     }
+
 }

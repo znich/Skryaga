@@ -26,4 +26,5 @@ public interface TransactionDao extends Dao<Transaction, Long> {
     List<Transaction> getFirstDaySpendingTransactions() throws SQLException;
 
     BigDecimal getIncomeAmount(DateTime date) throws SQLException;
+
 }
