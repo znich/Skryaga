@@ -39,6 +39,7 @@ public class DBConnector extends OrmLiteSqliteOpenHelper {
     private BalanceDao balanceDao;
     private SpendingStatisticsDao spendingStatisticsDao;
     private UserSettingsDao userSettingsDao;
+    private GoalTransactionDao goalTransactionDao;
 
     public DBConnector(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -155,5 +156,16 @@ public class DBConnector extends OrmLiteSqliteOpenHelper {
             }
         }
         return userSettingsDao;
+    }
+
+    public GoalTransactionDao getGoalTransactionDao() {
+        if (goalTransactionDao == null) {
+            try {
+                goalTransactionDao = new GoalTransactionDaoImpl(getConnectionSource());
+            } catch (SQLException e) {
+                Log.e(TAG, "Error creating GoalTransactionDaoImpl", e);
+            }
+        }
+        return goalTransactionDao;
     }
 }

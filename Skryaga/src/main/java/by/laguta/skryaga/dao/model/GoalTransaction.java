@@ -18,6 +18,10 @@ public class GoalTransaction {
     public GoalTransaction() {
     }
 
+    public GoalTransaction(Transaction transaction) {
+        this.transaction = transaction;
+    }
+
     public Long getId() {
         return id;
     }

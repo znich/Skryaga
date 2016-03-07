@@ -5,28 +5,26 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Looper;
 import android.preference.PreferenceManager;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 import by.laguta.skryaga.R;
+import by.laguta.skryaga.activity.adapter.TransactionsAdapter;
 import by.laguta.skryaga.activity.dialog.Progress;
-import by.laguta.skryaga.dao.model.Currency;
 import by.laguta.skryaga.dao.model.ExchangeRate;
 import by.laguta.skryaga.dao.model.UserSettings;
 import by.laguta.skryaga.service.*;
 import by.laguta.skryaga.service.model.Goal;
 import by.laguta.skryaga.service.model.MainInfoModel;
+import by.laguta.skryaga.service.util.CurrencyUtil;
 import by.laguta.skryaga.service.util.HelperFactory;
 import by.laguta.skryaga.service.util.Settings;
 import by.laguta.skryaga.service.util.UpdateTask;
-
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
-import java.util.Locale;
 
 
 public class MainActivity extends Activity {
@@ -53,6 +51,9 @@ public class MainActivity extends Activity {
     private TextView toolbarText;
     private TextView goalAmount;
 
+    private SwipeRefreshLayout refreshLayout;
+    private RecyclerView transactionsList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +63,8 @@ public class MainActivity extends Activity {
         bindViews();
 
         initToolbar();
+
+        initTransactionsList();
     }
 
     private void bindViews() {
@@ -74,12 +77,36 @@ public class MainActivity extends Activity {
         dailyAmount = (TextView) findViewById(R.id.daily_amount_field);
         goalAmount = (TextView) findViewById(R.id.goal_amount_field);
         exchangeRate = (TextView) findViewById(R.id.exchange_amount_field);
+
+        refreshLayout = (SwipeRefreshLayout) findViewById(R.id.transactionsRefresh);
+        transactionsList = (RecyclerView) findViewById(R.id.transactions_view);
+
     }
 
     private void initToolbar() {
         toolbar.inflateMenu(R.menu.menu_main);
         Typeface tf = Typeface.createFromAsset(getAssets(), getString(R.string.fontArial));
         toolbarText.setTypeface(tf);
+    }
+
+    private void initTransactionsList() {
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        transactionsList.setLayoutManager(layoutManager);
+
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshLayout.setRefreshing(true);
+                updateTransactionList();
+                refreshLayout.setRefreshing(false);
+            }
+        });
+    }
+
+    private void updateTransactionList() {
+        TransactionsAdapter transactionsAdapter = new TransactionsAdapter(
+                calculationService.getAllTransactions(), this);
+        transactionsList.setAdapter(transactionsAdapter);
     }
 
     @Override
@@ -108,18 +135,18 @@ public class MainActivity extends Activity {
     private void populateMainInfo() {
         MainInfoModel mainInfoModel = calculationService.getMainInfoModel();
 
-        totalAmountField.setText(formatCurrencyByr(mainInfoModel.getTotalAmount()));
+        totalAmountField.setText(CurrencyUtil.formatCurrencyByr(mainInfoModel.getTotalAmount(), true));
 
-        spentToday.setText(formatCurrencyByr(mainInfoModel.getTodaySpending()));
+        spentToday.setText(CurrencyUtil.formatCurrencyByr(mainInfoModel.getTodaySpending(), true));
 
-        restForToday.setText(formatCurrencyByr(mainInfoModel.getRestForToday()));
+        restForToday.setText(CurrencyUtil.formatCurrencyByr(mainInfoModel.getRestForToday(), true));
 
-        dailyAmount.setText(formatCurrencyByr(mainInfoModel.getDailyAmount()));
+        dailyAmount.setText(CurrencyUtil.formatCurrencyByr(mainInfoModel.getDailyAmount(), true));
 
         Goal goal = mainInfoModel.getGoal();
         double goalAmountValue = goal.getAmount().doubleValue();
-        String goalText = goal.getCurrencyType().equals(Currency.CurrencyType.BYR)
-                ? formatCurrencyByr(goalAmountValue) : formatCurrencyUsd(goalAmountValue);
+        String goalText = CurrencyUtil.formatCurrency(goalAmountValue, goal.getCurrencyType());
+
         goalAmount.setText(goalText);
 
         ExchangeRate lowestSellExchangeRate = exchangeRateService.getLowestExchangeRate(
@@ -135,24 +162,8 @@ public class MainActivity extends Activity {
     private void populateExchangeRate(ExchangeRate lowestSellExchangeRate) {
         if (lowestSellExchangeRate != null) {
             Double sellingRate = lowestSellExchangeRate.getSellingRate();
-            exchangeRate.setText(formatCurrencyByr(sellingRate));
+            exchangeRate.setText(CurrencyUtil.formatCurrencyByr(sellingRate, true));
         }
-    }
-
-    private String formatCurrencyByr(Double totalAmount) {
-        return formatCurrency(totalAmount) + "р";
-    }
-
-    private String formatCurrencyUsd(Double totalAmount) {
-        return formatCurrency(totalAmount) + "$";
-    }
-
-    private String formatCurrency(Double totalAmount) {
-        DecimalFormat formatter = (DecimalFormat) NumberFormat.getInstance(Locale.US);
-        DecimalFormatSymbols symbols = formatter.getDecimalFormatSymbols();
-        symbols.setGroupingSeparator(' ');
-        formatter.setDecimalFormatSymbols(symbols);
-        return formatter.format(totalAmount);
     }
 
     public void showSettings(MenuItem item) {
@@ -193,6 +204,7 @@ public class MainActivity extends Activity {
             @Override
             public void onUpdated(Void model) {
                 populateMainInfo();
+                updateTransactionList();
             }
         });
     }
@@ -203,6 +215,7 @@ public class MainActivity extends Activity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
+
 
     private class MainInfoUpdateTask extends UpdateTask<Void> {
 
@@ -218,7 +231,6 @@ public class MainActivity extends Activity {
 
         @Override
         protected Void performInBackground() {
-            Looper.prepare();
             statisticsService.updateStatistics();
             return null;
         }
@@ -232,7 +244,6 @@ public class MainActivity extends Activity {
             super.onPostExecute(aVoid);
             if (dialog.isShowing()) {
                 dialog.dismiss();
-                Looper.loop();
             }
         }
     }

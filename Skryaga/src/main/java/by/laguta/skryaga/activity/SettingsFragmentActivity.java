@@ -1,7 +1,6 @@
 package by.laguta.skryaga.activity;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 import by.laguta.skryaga.R;
@@ -16,14 +15,12 @@ public class SettingsFragmentActivity extends Activity {
 
     private static final String TAG = SettingsFragmentActivity.class.getSimpleName();
 
-    private static Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getFragmentManager().beginTransaction().replace(android.R.id.content,
-                new SettingsFragment()).commit();
-        context = getApplicationContext();
+        getFragmentManager().beginTransaction().replace(
+                android.R.id.content, new SettingsFragment()).commit();
     }
 
     public static class SettingsFragment extends PreferenceFragment {

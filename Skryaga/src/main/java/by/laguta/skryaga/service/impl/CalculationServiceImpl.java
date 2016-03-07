@@ -4,14 +4,13 @@ import android.util.Log;
 import by.laguta.skryaga.dao.BalanceDao;
 import by.laguta.skryaga.dao.SpendingStatisticsDao;
 import by.laguta.skryaga.dao.TransactionDao;
-import by.laguta.skryaga.dao.model.Balance;
-import by.laguta.skryaga.dao.model.Currency;
-import by.laguta.skryaga.dao.model.ExchangeRate;
-import by.laguta.skryaga.dao.model.SpendingStatistics;
+import by.laguta.skryaga.dao.model.*;
 import by.laguta.skryaga.service.CalculationService;
 import by.laguta.skryaga.service.ExchangeRateService;
 import by.laguta.skryaga.service.model.Goal;
 import by.laguta.skryaga.service.model.MainInfoModel;
+import by.laguta.skryaga.service.model.TransactionUIModel;
+import by.laguta.skryaga.service.util.ConvertUtil;
 import by.laguta.skryaga.service.util.HelperFactory;
 import by.laguta.skryaga.service.util.Settings;
 import org.joda.time.DateTime;
@@ -20,6 +19,8 @@ import org.joda.time.Interval;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Revision Info : $Author$ $Date$
@@ -133,6 +134,17 @@ public class CalculationServiceImpl implements CalculationService {
         }
 
         return goal;
+    }
+
+    @Override
+    public List<TransactionUIModel> getAllTransactions() {
+        List<Transaction> transactions = new ArrayList<Transaction>();
+        try {
+            transactions = transactionDao.getTransactionsList();
+        } catch (SQLException e) {
+            Log.e(TAG, "Error getting transactions", e);
+        }
+        return ConvertUtil.convertToUIModels(transactions);
     }
 
     private long getDaysBeforePrepaid() {

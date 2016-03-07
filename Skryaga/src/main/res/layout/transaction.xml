@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/transactionItem">
+    <LinearLayout android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:id="@+id/transactionInfo">
+        <TextView
+                android:id="@+id/transactionDate"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                style="@style/transactionItemDate"
+                android:text="30.01.2016 12:45"/>
+
+        <ImageView
+                android:id="@+id/transactionTypeImage"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:background="@drawable/ic_arrow_upward_white_36dp"
+                />
+        <TextView
+                android:id="@+id/transactionAmount"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                style="@style/transactionAmount"
+                android:text="88 122 980р"
+                />
+    </LinearLayout>
+    <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="false"
+            android:layout_below="@id/transactionInfo">
+        <TextView
+                android:id="@+id/transactionMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/transactionMessage"
+                android:text="SHOP Sosedi MINSK 111111111111111111"
+                />
+    </LinearLayout>
+
+    <ImageButton
+            android:id="@+id/goalTransactionButton"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/ic_monetization_on_white_36dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_centerInParent="true"
+            android:clickable="true"
+            style="?android:attr/borderlessButtonStyle"/>
+
+</RelativeLayout>

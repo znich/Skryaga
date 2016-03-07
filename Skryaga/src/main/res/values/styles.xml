@@ -9,6 +9,7 @@
     <style name="AppDefault" parent="AppTheme">
         <item name="colorPrimary">@color/abisso</item>
         <item name="colorControlNormal">@color/colorWhite</item>
+        <item name="android:windowBackground">@color/abisso</item>
     </style>
 
     <style name="toolbarStyle">
@@ -32,8 +33,8 @@
         <!--<item name="android:alpha">0.87</item>-->
     </style>
 
-    <style name="mainInfoRightText" parent="mainInfoText">
-        <item name="android:paddingLeft">10dp</item>
+    <style name="mainInfoRightText" parent="mainInfoTextLabel">
+        <item name="android:paddingLeft">8dp</item>
     </style>
 
     <style name="mainInfoTextLabel" parent="mainInfoText">
@@ -42,6 +43,34 @@
 
     <style name="buttonStyle">
         <item name="android:colorPressedHighlight">#f3f3f3</item>
+    </style>
+
+    <!-- TRANSACTIONS -->
+    <style name="transactionsList">
+
+    </style>
+
+    <style name="transactionItem">
+        <item name="android:background">@color/acquaProfonda</item>
+        <item name="android:padding">5dp</item>
+        <item name="android:layout_marginBottom">2dp</item>
+        <item name="android:layout_marginTop">2dp</item>
+    </style>
+    <style name="transactionText">
+        <item name="android:textColor">@color/teraLight</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:layout_centerVertical">true</item>
+    </style>
+    <style name="transactionItemDate" parent="transactionText">
+        <item name="android:width">140dp</item>
+        <item name="android:paddingRight">10dp</item>
+    </style>
+    <style name="transactionAmount" parent="transactionText">
+        <item name="android:paddingLeft">5dp</item>
+    </style>
+    <style name="transactionMessage" parent="transactionText">
+        <item name="android:textSize">12sp</item>
+        <item name="android:layout_marginTop">10dp</item>
     </style>
 
 </resources>

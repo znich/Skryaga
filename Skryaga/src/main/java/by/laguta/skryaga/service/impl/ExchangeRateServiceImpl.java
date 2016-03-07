@@ -136,6 +136,39 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
         }
     }
 
+    @Override
+    public ExchangeRate getNearestExchangeRate(DateTime dateTime) {
+        try {
+            ExchangeRate exchangeRateBefore = exchangeRateDao.getNearestExchangeRate(
+                    dateTime, false);
+
+            ExchangeRate exchangeRateAfter = exchangeRateDao.getNearestExchangeRate(
+                    dateTime, true);
+
+            if (exchangeRateBefore == null) {
+                return exchangeRateAfter;
+            }
+            if (exchangeRateAfter == null) {
+                return exchangeRateBefore;
+            }
+
+            Duration durationBefore = new Duration(exchangeRateBefore.getDate(), dateTime);
+
+            Duration durationAfter = new Duration(dateTime, exchangeRateAfter.getDate());
+
+            if (durationBefore.isShorterThan(durationAfter)) {
+                return exchangeRateBefore;
+            } else {
+                return exchangeRateAfter;
+            }
+
+        } catch (SQLException e) {
+            Log.e(TAG, "Error getting nearest exchange rate", e);
+        }
+        return null;
+    }
+
+
     public void setExchangeRateDao(ExchangeRateDao exchangeRateDao) {
         this.exchangeRateDao = exchangeRateDao;
     }

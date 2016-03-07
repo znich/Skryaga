@@ -2,10 +2,10 @@ package by.laguta.skryaga.service;
 
 import by.laguta.skryaga.service.model.Goal;
 import by.laguta.skryaga.service.model.MainInfoModel;
+import by.laguta.skryaga.service.model.TransactionUIModel;
 
-/**
- * Created by Anatoly on 30.01.2016.
- */
+import java.util.List;
+
 public interface CalculationService {
 
 
@@ -21,4 +21,6 @@ public interface CalculationService {
     Double getTodaySpending();
 
     Goal calculateGoal();
+
+    List<TransactionUIModel> getAllTransactions();
 }

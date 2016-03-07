@@ -18,4 +18,6 @@ public interface ExchangeRateDao extends Dao<ExchangeRate, Long> {
     ExchangeRate getExchangeRate(DateTime date) throws SQLException;
 
     ExchangeRate getLastExchangeRate() throws SQLException;
+
+    ExchangeRate getNearestExchangeRate(DateTime date, boolean greater) throws SQLException;
 }

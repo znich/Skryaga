@@ -109,4 +109,12 @@ public class TransactionDaoImpl extends OrmLiteBaseDAOImpl<Transaction, Long>
         return getSumAmount(query(queryBuilder.prepare()));
     }
 
+    @Override
+    public List<Transaction> getTransactionsList() throws SQLException {
+        QueryBuilder<Transaction, Long> queryBuilder = queryBuilder();
+        queryBuilder();
+        queryBuilder.orderBy(Transaction.DATE_COLUMN, false);
+        return query(queryBuilder.prepare());
+    }
+
 }

@@ -139,6 +139,12 @@ public class Transaction {
         this.balance = balance;
     }
 
+    public Transaction getClone() {
+        return new Transaction(
+                id, messageDate, bankAccount, cardNumber, currencyType, date,
+                amount, type, message, comment, accumulation, approved, balance);
+    }
+
     public boolean isByrCurrency() {
         return CurrencyType.BYR.equals(getCurrencyType());
     }
@@ -276,7 +282,7 @@ public class Transaction {
         if (goalTransaction != null ? !goalTransaction.equals(that.goalTransaction)
                 : that.goalTransaction != null)
             return false;
-        if (id != null ? !id.equals(that.id) : that.id != null)return false;
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
         if (message != null ? !message.equals(that.message) : that.message != null) return false;
         if (messageDate != null ? !messageDate.equals(that.messageDate) : that.messageDate != null)
             return false;
