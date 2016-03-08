@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="basketFill">{mdi-basket-fill #2FBD85}</string>
+    <string name="basketUnFill">{mdi-basket-unfill @color/tera}</string>
+</resources>

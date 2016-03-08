@@ -15,12 +15,13 @@
                 style="@style/transactionItemDate"
                 android:text="30.01.2016 12:45"/>
 
-        <ImageView
+        <com.joanzapata.iconify.widget.IconTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:id="@+id/transactionTypeImage"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:background="@drawable/ic_arrow_upward_white_36dp"
-                />
+                android:text="@string/basketFill"
+                style="@style/transactionIcon"/>
+
         <TextView
                 android:id="@+id/transactionAmount"
                 android:layout_height="wrap_content"
@@ -43,18 +44,21 @@
                 />
     </LinearLayout>
 
-    <ImageButton
+    <com.joanzapata.iconify.widget.IconTextView
             android:id="@+id/goalTransactionButton"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:background="@drawable/ic_monetization_on_white_36dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="5dp"
             android:layout_marginEnd="5dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
             android:layout_centerInParent="true"
+            android:text="{mdi-cash-usd}"
             android:clickable="true"
-            style="?android:attr/borderlessButtonStyle"/>
+            style="@style/transactionGoalIcon"/>
+
 
 </RelativeLayout>

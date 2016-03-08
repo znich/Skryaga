@@ -2,6 +2,8 @@ package by.laguta.skryaga;
 
 import android.app.Application;
 import by.laguta.skryaga.service.util.HelperFactory;
+import com.joanzapata.iconify.Iconify;
+import com.joanzapata.iconify.fonts.MaterialCommunityModule;
 
 /**
  * Revision Info : $Author$ $Date$
@@ -16,7 +18,9 @@ public class SkryagaApplication extends Application {
     public void onCreate() {
         super.onCreate();
         HelperFactory.initialize(getApplicationContext());
+        Iconify.with(new MaterialCommunityModule());
     }
+
     @Override
     public void onTerminate() {
         HelperFactory.releaseConnector();

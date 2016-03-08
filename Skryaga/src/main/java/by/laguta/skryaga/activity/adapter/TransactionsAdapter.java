@@ -6,8 +6,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 import by.laguta.skryaga.R;
 import by.laguta.skryaga.activity.dialog.GoalDialog;
@@ -21,6 +19,7 @@ import by.laguta.skryaga.service.model.TransactionUIModel;
 import by.laguta.skryaga.service.util.ConvertUtil;
 import by.laguta.skryaga.service.util.CurrencyUtil;
 import by.laguta.skryaga.service.util.HelperFactory;
+import com.joanzapata.iconify.widget.IconTextView;
 import org.joda.time.format.*;
 
 import java.math.BigDecimal;
@@ -132,12 +131,12 @@ public class TransactionsAdapter
         }
 
         private void initializeAmount(TransactionUIModel transaction) {
-            ImageView transactionImage = (ImageView) itemView.findViewById(
+            IconTextView transactionIcon = (IconTextView) itemView.findViewById(
                     R.id.transactionTypeImage);
-            int drawable = Transaction.Type.INCOME.equals(transaction.getType())
-                    ? R.drawable.ic_arrow_downward_white_36dp
-                    : R.drawable.ic_arrow_upward_white_36dp;
-            transactionImage.setBackgroundResource(drawable);
+
+            transactionIcon.setText(transaction.isIncome()
+                    ? context.getText(R.string.basketFill)
+                    : context.getText(R.string.basketUnFill));
 
             TextView amountView = (TextView) itemView.findViewById(R.id.transactionAmount);
             amountView.setText(CurrencyUtil.formatCurrency(
@@ -151,10 +150,10 @@ public class TransactionsAdapter
         }
 
         private void initializeImageButton(final TransactionUIModel transaction) {
-            ImageButton goalImage = (ImageButton) itemView.findViewById(R.id.goalTransactionButton);
+            IconTextView goalImage = (IconTextView) itemView.findViewById(
+                    R.id.goalTransactionButton);
 
-            if (transaction.getGoalTransaction() != null
-                    || Transaction.Type.INCOME.equals(transaction.getType())) {
+            if (transaction.getGoalTransaction() != null || transaction.isIncome()) {
                 goalImage.setVisibility(View.GONE);
             } else {
                 goalImage.setVisibility(View.VISIBLE);

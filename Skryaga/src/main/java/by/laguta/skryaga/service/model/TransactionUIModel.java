@@ -139,6 +139,10 @@ public class TransactionUIModel {
         this.goalTransaction = goalTransaction;
     }
 
+    public boolean isIncome() {
+        return Transaction.Type.INCOME.equals(getType());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

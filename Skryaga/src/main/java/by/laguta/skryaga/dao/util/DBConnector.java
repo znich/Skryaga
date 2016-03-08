@@ -10,6 +10,7 @@ import by.laguta.skryaga.dao.model.*;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
+import org.joda.time.DateTime;
 
 import java.sql.SQLException;
 
@@ -58,8 +59,15 @@ public class DBConnector extends OrmLiteSqliteOpenHelper {
             TableUtils.createTable(connectionSource, GoalTransaction.class);
             TableUtils.createTable(connectionSource, UserSettings.class);
 
+            BankAccount bankAccount = new BankAccount(null, context.getString(R.string.bank_accounts), "");
             getBankAccountDao().create(
-                    new BankAccount(null, context.getString(R.string.bank_accounts), ""));
+                    bankAccount);
+            getTransactionDao().create(new Transaction(
+                    null, new DateTime(), bankAccount, "", Currency.CurrencyType.BYR,
+                    new DateTime(), 234000d, Transaction.Type.INCOME, "Some dummy message1", false, true));
+            getTransactionDao().create(new Transaction(
+                    null, new DateTime(), bankAccount, "", Currency.CurrencyType.BYR,
+                    new DateTime(), 234000d, Transaction.Type.SPENDING, "Some dummy message2", false, true));
         } catch (SQLException e) {
             Log.e(TAG, "error creating DB " + DATABASE_NAME);
             throw new RuntimeException(e);

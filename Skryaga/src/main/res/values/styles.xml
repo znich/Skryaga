@@ -71,6 +71,13 @@
     <style name="transactionMessage" parent="transactionText">
         <item name="android:textSize">12sp</item>
         <item name="android:layout_marginTop">10dp</item>
+        <item name="android:alpha">0.87</item>
+    </style>
+    <style name="transactionIcon" parent="transactionText">
+        <item name="android:layout_marginTop">-2dp</item>
+    </style>
+    <style name="transactionGoalIcon" parent="transactionText">
+        <item name="android:textSize">25sp</item>
     </style>
 
     <!-- Goal dialog-->
