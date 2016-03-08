@@ -135,7 +135,8 @@ public class MainActivity extends Activity {
     private void populateMainInfo() {
         MainInfoModel mainInfoModel = calculationService.getMainInfoModel();
 
-        totalAmountField.setText(CurrencyUtil.formatCurrencyByr(mainInfoModel.getTotalAmount(), true));
+        totalAmountField.setText(
+                CurrencyUtil.formatCurrencyByr(mainInfoModel.getTotalAmount(), true));
 
         spentToday.setText(CurrencyUtil.formatCurrencyByr(mainInfoModel.getTodaySpending(), true));
 

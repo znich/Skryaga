@@ -44,6 +44,9 @@ public class Settings {
 
     public void updateSettings(UserSettings userSettings) {
         try {
+            if (model != null) {
+                userSettings.setId(model.getId());
+            }
             userSettingsDao.createOrUpdate(userSettings);
             model = userSettings;
         } catch (SQLException e) {
