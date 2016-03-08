@@ -23,7 +23,9 @@
     <string name="progressTitle">Please wait</string>
     <string name="updatePreference">Update exist messages</string>
     <string name="statisticsUpdating">Statistics is being updated</string>
-    <string name="goalDialogTitle">Select goal amount</string>
+    <string name="goalDialogTitle">Enter goal amount</string>
+    <string name="rubles">р.</string>
+    <string name="rateLabel">Rate:</string>
 
 
 </resources>

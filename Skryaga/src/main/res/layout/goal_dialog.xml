@@ -2,7 +2,8 @@
 
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
              android:layout_width="match_parent"
-             android:layout_height="match_parent">
+             android:layout_height="match_parent"
+             style="@style/goalDialog">
     <TableRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -10,17 +11,18 @@
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Amount:"/>
+                style="@style/dialogLabel"
+                android:text="@string/amountLabel"/>
         <EditText
                 android:id="@+id/goal_dialog_amount"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="90"
+                android:layout_weight="70"
                 android:inputType="numberDecimal"/>
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="р."/>
+                android:text="@string/rubles"/>
     </TableRow>
     <TableRow
             android:layout_width="match_parent"
@@ -30,17 +32,19 @@
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Rate:"/>
+                android:text="@string/rateLabel"
+                style="@style/dialogLabel"/>
         <EditText
                 android:id="@+id/goal_dialog_rate"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="60"
-                android:inputType="numberDecimal"/>
+                android:layout_weight="70"
+                android:inputType="numberDecimal"
+                />
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="р."/>
+                android:text="@string/rubles"/>
     </TableRow>
     <TableRow
             android:layout_width="match_parent"
@@ -50,12 +54,13 @@
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Goal:"/>
+                android:text="@string/goalLabel"
+                style="@style/dialogLabel"/>
         <EditText
                 android:id="@+id/goal_dialog_goal"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="60"
+                android:layout_weight="70"
                 android:inputType="numberDecimal"/>
         <TextView
                 android:layout_width="wrap_content"

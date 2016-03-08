@@ -230,7 +230,7 @@ public class CalculationServiceImpl implements CalculationService {
             DateTime prepaidDate = getPrepaidDate(month);
             while (prepaidAmount.doubleValue() == 0d) {
                 prepaidAmount = transactionDao.getIncomeAmount(prepaidDate);
-                prepaidDate.minusDays(1);
+                prepaidDate = prepaidDate.minusDays(1);
             }
         } catch (SQLException e) {
             Log.e(TAG, "Error getting prepaid amount", e);

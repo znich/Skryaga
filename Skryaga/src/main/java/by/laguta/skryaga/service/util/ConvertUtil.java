@@ -18,15 +18,19 @@ import java.util.List;
 public class ConvertUtil {
 
     public static TransactionUIModel convertToUIModel(Transaction transaction) {
-        return new TransactionUIModel(
+        GoalTransaction goalTransaction = transaction.getGoalTransaction();
+        TransactionUIModel transactionUIModel = new TransactionUIModel(
                 transaction.getId(),
                 transaction.getAmount(),
                 transaction.getMessageDate(),
                 transaction.getDate(),
                 transaction.getType(),
                 transaction.getCurrencyType(),
-                transaction.getMessage(),
-                convertToUIModel(transaction.getGoalTransaction()));
+                transaction.getMessage());
+        if (goalTransaction != null) {
+            transactionUIModel.setGoalTransaction(convertToUIModel(goalTransaction));
+        }
+        return transactionUIModel;
     }
 
     public static List<TransactionUIModel> convertToUIModels(

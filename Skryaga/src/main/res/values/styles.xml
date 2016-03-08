@@ -33,12 +33,12 @@
         <!--<item name="android:alpha">0.87</item>-->
     </style>
 
-    <style name="mainInfoRightText" parent="mainInfoTextLabel">
-        <item name="android:paddingLeft">8dp</item>
-    </style>
-
     <style name="mainInfoTextLabel" parent="mainInfoText">
         <item name="android:layout_marginRight">5dp</item>
+    </style>
+
+    <style name="mainInfoRightText" parent="mainInfoTextLabel">
+        <item name="android:paddingLeft">8dp</item>
     </style>
 
     <style name="buttonStyle">
@@ -71,6 +71,14 @@
     <style name="transactionMessage" parent="transactionText">
         <item name="android:textSize">12sp</item>
         <item name="android:layout_marginTop">10dp</item>
+    </style>
+
+    <!-- Goal dialog-->
+    <style name="goalDialog">
+        <item name="android:paddingLeft">23dp</item>
+    </style>
+    <style name="dialogLabel">
+        <item name="android:textSize">16sp</item>
     </style>
 
 </resources>

@@ -59,11 +59,20 @@ public class TransactionUIModel {
         setAmount(transaction.getAmount());
         setType(transaction.getType());
         setMessage(transaction.getMessage());
+        setGoalTransaction(transaction.getGoalTransaction());
     }
 
     public TransactionUIModel getClone() {
         return new TransactionUIModel(
                 id, amount, messageDate, transactionDate, type, currencyType, message);
+    }
+
+    public boolean isByrTransaction() {
+        return Currency.CurrencyType.BYR.equals(getCurrencyType());
+    }
+
+    public boolean isUsdTransaction() {
+        return Currency.CurrencyType.USD.equals(getCurrencyType());
     }
 
     public Long getId() {

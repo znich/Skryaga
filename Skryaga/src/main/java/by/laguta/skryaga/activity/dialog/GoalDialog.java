@@ -44,6 +44,8 @@ public class GoalDialog extends AlertDialog {
         super(context);
         setTitle(context.getString(R.string.goalDialogTitle));
 
+        setCanceledOnTouchOutside(false);
+
         View layout = LayoutInflater.from(context).inflate(R.layout.goal_dialog, null);
         setView(layout);
 
@@ -109,11 +111,11 @@ public class GoalDialog extends AlertDialog {
                 } else {
                     populateRate(0d);
                 }
-                updateInputText(transaction, amount);
+                populateInput(transaction, amount);
                 break;
             case USD:
                 updateRowsVisibility(false, false, true);
-                updateInputText(transaction, goal);
+                populateInput(transaction, goal);
                 break;
         }
     }
@@ -125,9 +127,10 @@ public class GoalDialog extends AlertDialog {
         setRowVisibility(goal, goalVisibility);
     }
 
-    private void updateInputText(TransactionUIModel transaction, EditText editText) {
+    private void populateInput(TransactionUIModel transaction, EditText editText) {
         editText.setText(CurrencyUtil.formatCurrency(
                 transaction.getAmount(), transaction.getCurrencyType(), false));
+        editText.setSelection(editText.getText().length());
     }
 
     private void setRowVisibility(View view, boolean visible) {
@@ -145,6 +148,14 @@ public class GoalDialog extends AlertDialog {
         return currency != null ? currency : 0d;
     }
 
+    private Double getMainInputValue() {
+        if (transaction.isByrTransaction()) {
+            return getByrAmountValue();
+        } else {
+            return getGoalValue();
+        }
+    }
+
     private Double getGoalValue() {
         Double currency = CurrencyUtil.parseCurrency(goal.getText().toString());
         return currency != null ? currency : 0d;
@@ -160,6 +171,10 @@ public class GoalDialog extends AlertDialog {
 
     private void populateGoal(Double usd) {
         goal.setText(CurrencyUtil.formatCurrency(usd, Currency.CurrencyType.USD, false));
+    }
+
+    private void setOkEnable(boolean enabled) {
+        getButton(BUTTON_POSITIVE).setEnabled(enabled);
     }
 
 
@@ -189,6 +204,8 @@ public class GoalDialog extends AlertDialog {
                 valuesRecalculating = true;
                 recalculateValues(s);
                 valuesRecalculating = false;
+
+                validateDialog();
             }
         }
 
@@ -217,7 +234,28 @@ public class GoalDialog extends AlertDialog {
                     populateRate(rateValue);
                     break;
             }
+        }
 
+        private void validateDialog() {
+            if (transaction.isByrTransaction()) {
+                validateInput(amount);
+            }
+            if (transaction.isUsdTransaction()) {
+                validateInput(goal);
+            }
+        }
+
+        private void validateInput(EditText editText) {
+            Double mainInputValue = getMainInputValue();
+            Double transactionAmount = transaction.getAmount();
+            if (mainInputValue > transactionAmount) {
+                populateInput(transaction, editText);
+            }
+            if (mainInputValue <= 0) {
+                setOkEnable(false);
+            } else {
+                setOkEnable(true);
+            }
         }
     }
 }

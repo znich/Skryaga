@@ -118,18 +118,7 @@ public class TransactionsAdapter
 
             initializeMassage(transaction);
 
-            ImageButton goalImage = (ImageButton) itemView.findViewById(R.id.goalTransactionButton);
-
-            if (transaction.getGoalTransaction() != null) {
-                goalImage.setVisibility(View.GONE);
-            }
-
-            goalImage.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showGoalTransactionDialog(transaction);
-                }
-            });
+            initializeImageButton(transaction);
         }
 
         private void initializeDate(TransactionUIModel transaction) {
@@ -161,11 +150,29 @@ public class TransactionsAdapter
             message.setText(transaction.getMessage());
         }
 
+        private void initializeImageButton(final TransactionUIModel transaction) {
+            ImageButton goalImage = (ImageButton) itemView.findViewById(R.id.goalTransactionButton);
+
+            if (transaction.getGoalTransaction() != null
+                    || Transaction.Type.INCOME.equals(transaction.getType())) {
+                goalImage.setVisibility(View.GONE);
+            } else {
+                goalImage.setVisibility(View.VISIBLE);
+            }
+
+            goalImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showGoalTransactionDialog(transaction);
+                }
+            });
+        }
+
         private void showGoalTransactionDialog(final TransactionUIModel transaction) {
             GoalDialog goalDialog = GoalDialog.getInstance(context);
+            goalDialog.show();
             goalDialog.populate(transaction);
             goalDialog.setGoalDialogListener(createGoalDialogListener(transaction));
-            goalDialog.show();
         }
 
         private GoalDialogListener createGoalDialogListener(final TransactionUIModel transaction) {
