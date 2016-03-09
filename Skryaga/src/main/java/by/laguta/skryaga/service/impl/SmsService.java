@@ -84,7 +84,7 @@ public class SmsService extends Service {
 
     private void saveTransaction(String smsSender, String smsBody, Long smsDate) {
         try {
-            DateTime messageDate = new DateTime(new Date(smsDate));
+            DateTime messageDate = new DateTime(new Date(smsDate)).withMillisOfSecond(0);
             Transaction transaction = smsParser.parseToTransaction(smsBody, messageDate);
             BankAccount bankAccount = bankAccountDao.getByNumber(smsSender);
             transaction.setBankAccount(bankAccount);

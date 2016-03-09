@@ -30,10 +30,11 @@ public class SmsMonitor extends BroadcastReceiver {
                 messages[i] = SmsMessage.createFromPdu((byte[]) pduArray[i]);
             }
             String from = messages[0].getDisplayOriginatingAddress();
+            //TODO: AL add check from db bank account
             if (getStringResource(R.string.bank_accounts).contains(from)) {
                 StringBuilder bodyText = new StringBuilder();
-                for (int i = 0; i < messages.length; i++) {
-                    bodyText.append(messages[i].getMessageBody());
+                for (SmsMessage message : messages) {
+                    bodyText.append(message.getMessageBody());
                 }
                 String body = bodyText.toString();
                 Intent mIntent = new Intent(context, SmsService.class);

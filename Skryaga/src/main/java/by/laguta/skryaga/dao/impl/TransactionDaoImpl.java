@@ -30,8 +30,7 @@ public class TransactionDaoImpl extends OrmLiteBaseDAOImpl<Transaction, Long>
         QueryBuilder<Transaction, Long> queryBuilder = queryBuilder();
         queryBuilder.orderBy(Transaction.MESSAGE_DATE, false).limit(1L);
         PreparedQuery<Transaction> preparedQuery = queryBuilder.prepare();
-        List<Transaction> transactions = query(preparedQuery);
-        return transactions.isEmpty() ? null : transactions.get(0);
+        return queryForFirst(preparedQuery);
     }
 
     @Override
@@ -39,6 +38,7 @@ public class TransactionDaoImpl extends OrmLiteBaseDAOImpl<Transaction, Long>
         QueryBuilder<Transaction, Long> queryBuilder = queryBuilder();
         queryBuilder.where().gt(Transaction.MESSAGE_DATE, new DateTime().withTimeAtStartOfDay())
                 .and().eq(Transaction.TYPE, Transaction.Type.SPENDING)
+                .and().isNull(Transaction.GOAL_TRANSACTION)
                 .and().eq(Transaction.APPROVED_COLUMN, true);
         ;
         PreparedQuery<Transaction> preparedQuery = queryBuilder.prepare();

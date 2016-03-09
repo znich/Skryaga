@@ -178,6 +178,7 @@ public class TransactionsAdapter
             return new GoalDialogListener() {
                 @Override
                 public void onGoalTransactionSaving(GoalTransactionUIModel goalTransaction) {
+                    //TODO: AL  add saving exchange rate
                     TransactionUIModel newTransaction = goalTransaction.getTransaction();
                     if (transaction.getAmount().equals(newTransaction.getAmount())) {
                         saveGoalTransaction(newTransaction.getGoalTransaction());
