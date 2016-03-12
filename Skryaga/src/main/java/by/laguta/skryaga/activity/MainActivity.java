@@ -3,7 +3,6 @@ package by.laguta.skryaga.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -25,6 +24,8 @@ import by.laguta.skryaga.service.util.CurrencyUtil;
 import by.laguta.skryaga.service.util.HelperFactory;
 import by.laguta.skryaga.service.util.Settings;
 import by.laguta.skryaga.service.util.UpdateTask;
+import com.joanzapata.iconify.IconDrawable;
+import com.joanzapata.iconify.fonts.MaterialCommunityIcons;
 
 
 public class MainActivity extends Activity {
@@ -69,7 +70,6 @@ public class MainActivity extends Activity {
 
     private void bindViews() {
         toolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
-        toolbarText = (TextView) findViewById(R.id.toolbar_title);
 
         totalAmountField = (TextView) findViewById(R.id.total_amount_field);
         spentToday = (TextView) findViewById(R.id.spent_amount_field);
@@ -85,8 +85,17 @@ public class MainActivity extends Activity {
 
     private void initToolbar() {
         toolbar.inflateMenu(R.menu.menu_main);
-        Typeface tf = Typeface.createFromAsset(getAssets(), getString(R.string.fontArial));
-        toolbarText.setTypeface(tf);
+        Menu menu = toolbar.getMenu();
+        menu.findItem(R.id.refresh).setIcon(
+                new IconDrawable(this, MaterialCommunityIcons.mdi_reload)
+                        .colorRes(R.color.white)
+                        .actionBarSize());
+        menu.findItem(R.id.settings).setIcon(
+                new IconDrawable(this, MaterialCommunityIcons.mdi_settings)
+                        .colorRes(R.color.white)
+                        .actionBarSize());
+        toolbar.setTitle(getString(R.string.toolbarTitle));
+        toolbar.setTitleTextAppearance(this, R.style.toolbarStyle);
     }
 
     private void initTransactionsList() {
@@ -213,7 +222,7 @@ public class MainActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        /*getMenuInflater().inflate(R.menu.menu_main, menu);*/
         return true;
     }
 
