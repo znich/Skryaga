@@ -39,7 +39,7 @@ public class RestoreDBPreference extends BackupPreference {
                 dst.transferFrom(src, 0, src.size());
                 src.close();
                 dst.close();
-                Toast.makeText(getContext(), "Import Successful!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Restore Successful!", Toast.LENGTH_SHORT).show();
 
             }
         } catch (Exception e) {

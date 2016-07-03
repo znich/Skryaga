@@ -28,6 +28,7 @@ public class CurrencyUtil {
         DecimalFormat formatter = (DecimalFormat) NumberFormat.getInstance(Locale.US);
         DecimalFormatSymbols symbols = formatter.getDecimalFormatSymbols();
         symbols.setGroupingSeparator(' ');
+        symbols.setDecimalSeparator(',');
         formatter.setDecimalFormatSymbols(symbols);
         return formatter;
     }
@@ -79,7 +80,7 @@ public class CurrencyUtil {
     }
 
     public static String formatCurrencyByr(Double totalAmount, boolean addCurrencySymbol) {
-        String currencyString = formatCurrency(totalAmount, 0);
+        String currencyString = formatCurrency(totalAmount, 2);
         return addCurrencySymbol ? currencyString + "р" : currencyString;
     }
 

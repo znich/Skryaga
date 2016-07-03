@@ -51,7 +51,7 @@ public class ServiceHelper {
 
     public StatisticsService getStatisticsService() {
         if (statisticsService == null) {
-            statisticsService = new StatisticsServiceImpl();
+            statisticsService = new StatisticsServiceImpl(context);
         }
         return statisticsService;
     }

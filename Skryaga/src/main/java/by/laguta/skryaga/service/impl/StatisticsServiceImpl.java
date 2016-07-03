@@ -1,6 +1,8 @@
 package by.laguta.skryaga.service.impl;
 
+import android.content.Context;
 import android.util.Log;
+import by.laguta.skryaga.R;
 import by.laguta.skryaga.dao.BalanceDao;
 import by.laguta.skryaga.dao.SpendingStatisticsDao;
 import by.laguta.skryaga.dao.TransactionDao;
@@ -12,6 +14,7 @@ import by.laguta.skryaga.service.util.HelperFactory;
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.apache.commons.math3.stat.descriptive.rank.Median;
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
@@ -37,6 +40,11 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     private BalanceDao balanceDao = HelperFactory.getDaoHelper().getBalanceDao();
 
+    private Context context;
+
+    public StatisticsServiceImpl(Context context) {
+        this.context = context;
+    }
 
     @Override
     public void updateStatistics() {
@@ -84,7 +92,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     private double roundAmount(double amount) {
-        return new BigDecimal(amount).setScale(2, BigDecimal.ROUND_HALF_DOWN).doubleValue();
+        return new BigDecimal(amount).setScale(6, BigDecimal.ROUND_HALF_DOWN).doubleValue();
     }
 
     private double[] calculateAmounts(List<Transaction> transactions) throws SQLException {
@@ -95,7 +103,9 @@ public class StatisticsServiceImpl implements StatisticsService {
             if (amount == null) {
                 amount = new BigDecimal(0d);
             }
+
             amount = amount.add(getTransactionAmount(transaction));
+
             spendingMap.put(date, amount);
         }
 
@@ -148,9 +158,21 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     private BigDecimal getTransactionAmount(Transaction transaction) throws SQLException {
-        return transaction.isByrCurrency()
+        String denominationDateString = context.getString(R.string.denomination_date);
+        DateTime denominationDate = DateTimeFormat.forPattern("dd-MM-yyyy")
+                .parseDateTime(denominationDateString);
+        int denominationValue = Integer.parseInt(context.getString(R.string.denomination_value));
+
+        BigDecimal amount = transaction.isByrCurrency()
                 ? new BigDecimal(transaction.getAmount())
                 : getAmountForForeignCurrency(transaction);
+
+        DateTime transactionDate = transaction.getDate().withTimeAtStartOfDay();
+        if (transactionDate.isBefore(denominationDate)) {
+            amount = amount.divide(
+                    new BigDecimal(denominationValue), 4, BigDecimal.ROUND_HALF_DOWN);
+        }
+        return amount;
     }
 
     private BigDecimal getAmountForForeignCurrency(Transaction transaction) throws SQLException {

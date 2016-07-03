@@ -10,6 +10,8 @@ import by.laguta.skryaga.dao.model.*;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 
 import java.sql.SQLException;
 
@@ -25,10 +27,10 @@ public class DBConnector extends OrmLiteSqliteOpenHelper {
     private static final String TAG = DBConnector.class.getSimpleName();
 
     //имя файла базы данных который будет храниться в /data/data/APPNAME/DATABASE_NAME.db
-    private static final String DATABASE_NAME = "skryaga_dev.db";
+    public static final String DATABASE_NAME = "skryaga_dev.db";
 
     //с каждым увеличением версии, при нахождении в устройстве БД с предыдущей версией будет выполнен метод onUpgrade();
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     private Context context;
 
@@ -57,8 +59,8 @@ public class DBConnector extends OrmLiteSqliteOpenHelper {
             TableUtils.createTable(connectionSource, ExchangeRate.class);
             TableUtils.createTable(connectionSource, GoalTransaction.class);
             TableUtils.createTable(connectionSource, UserSettings.class);
-
-            BankAccount bankAccount = new BankAccount(null, context.getString(R.string.bank_accounts), "");
+            BankAccount bankAccount = new BankAccount(
+                    null, context.getString(R.string.bank_accounts), "");
             getBankAccountDao().create(bankAccount);
         } catch (SQLException e) {
             Log.e(TAG, "error creating DB " + DATABASE_NAME);
@@ -70,15 +72,28 @@ public class DBConnector extends OrmLiteSqliteOpenHelper {
     public void onUpgrade(
             SQLiteDatabase database, ConnectionSource connectionSource,
             int oldVersion, int newVersion) {
-      /*  try {
-            //Так делают ленивые, гораздо предпочтительнее не удаляя БД аккуратно вносить изменения
+       /* try {
             TableUtils.dropTable(connectionSource, Goal.class, true);
-            TableUtils.dropTable(connectionSource, Role.class, true);
             onCreate(database, connectionSource);
         } catch (SQLException e) {
             Log.e(TAG, "error upgrading db " + DATABASE_NAME + "from ver " + oldVersion);
             throw new RuntimeException(e);
         }*/
+        switch (newVersion) {
+            case 3:
+            case 4:
+                String denominationDateString = context.getString(R.string.denomination_date);
+                DateTime denominationDate = DateTimeFormat.forPattern("dd-MM-yyyy")
+                        .parseDateTime(denominationDateString);
+                try {
+                    getSpendingStatisticsDao().updateDenomination(
+                            denominationDate,
+                            Integer.parseInt(context.getString(R.string.denomination_value)));
+                } catch (SQLException e) {
+                    Log.e(TAG, "Error updating denomination", e);
+
+                }
+        }
     }
 
     public TransactionDao getTransactionDao() {
