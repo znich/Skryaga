@@ -61,15 +61,6 @@ public class SmsParserImpl implements SmsParser {
             + "\\s+(" + DOUBLE_REGEXP + ")"       // 8 - balance
             + "";
 
-    private static final String SMS_REGEXP_PAYMENT = "^Karta"
-            + "\\s+(" + DOUBLE_REGEXP + ")"         // 1 - card
-            + "\\s+-"
-            + "\\s+Oplata"
-            + "\\s+(" + OPERATION_REGEXP + ")"   // 2 - description
-            + "\\s+(" + DOUBLE_REGEXP + ")"     // 3 - amount
-            + "\\s+(\\S{3})"                    // 4 - currency
-            + "";
-
     private static final String DATE_FORMAT = "dd.MM.y HH:mm:ss";
 
     private static final String TRANSACTION_RESULT_OK = "OK";
@@ -95,10 +86,6 @@ public class SmsParserImpl implements SmsParser {
         if (matcher.find()) {
             return getTransactionWithoutDescription(matcher, defaultDate);
         }
-        matcher = Pattern.compile(SMS_REGEXP_PAYMENT).matcher(message);
-        if (matcher.find()) {
-            return getPaymentTransaction(matcher, defaultDate);
-        }
         throw new ParseException("Could not parse message : \n" + message, 0);
     }
 
@@ -113,7 +100,7 @@ public class SmsParserImpl implements SmsParser {
                 getCurrencyType(matcher, 6),
                 dateTime,
                 getAmount(matcher, 5),
-                getOperationType(matcher),
+                getOperationType(matcher, 5),
                 matcher.group(7),
                 false,
                 getResult(matcher, 8));
@@ -132,27 +119,13 @@ public class SmsParserImpl implements SmsParser {
                 getCurrencyType(matcher, 6),
                 dateTime,
                 getAmount(matcher, 5),
-                getOperationType(matcher),
+                getOperationType(matcher, 5),
                 "",
                 false,
                 getResult(matcher, 7));
         transaction.setBalance(balance);
         balance.setTransaction(transaction);
         return transaction;
-    }
-
-    private Transaction getPaymentTransaction(Matcher matcher, DateTime date) {
-        return new Transaction(
-                null,
-                null, null,
-                getCard(matcher),
-                getCurrencyType(matcher, 4),
-                date,
-                getAmount(matcher, 3),
-                Type.SPENDING,
-                matcher.group(2),
-                false,
-                true);
     }
 
     private String getCard(Matcher matcher) {
@@ -165,13 +138,12 @@ public class SmsParserImpl implements SmsParser {
         return date != null ? new DateTime(date) : defaultDate;
     }
 
-    private Type getOperationType(Matcher matcher) {
-        String operation = matcher.group(4).trim();
-        return Type.getByValue(operation);
-    }
-
     private Double getAmount(Matcher matcher, int group) {
         return Math.abs(Double.valueOf(matcher.group(group)));
+    }
+
+    private Type getOperationType(Matcher matcher, int group) {
+        return Double.valueOf(matcher.group(group)) > 0 ? Type.INCOME : Type.SPENDING;
     }
 
     private CurrencyType getCurrencyType(Matcher matcher, int group) {

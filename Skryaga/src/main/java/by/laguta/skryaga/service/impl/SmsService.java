@@ -77,15 +77,20 @@ public class SmsService extends Service {
             String smsSender = intent.getExtras().getString(SMS_SENDER);
             String smsBody = intent.getExtras().getString(SMS_BODY);
             Long smsDate = intent.getExtras().getLong(SMS_TIMESTAMP);
-            saveTransaction(smsSender, smsBody, smsDate);
+            saveTransaction(smsSender, smsBody, smsDate, null);
         }
         return START_STICKY;
     }
 
-    private void saveTransaction(String smsSender, String smsBody, Long smsDate) {
+    private void saveTransaction(
+            String smsSender, String smsBody, Long smsDate, DateTime lastSmsDate) {
         try {
             DateTime messageDate = new DateTime(new Date(smsDate)).withMillisOfSecond(0);
             Transaction transaction = smsParser.parseToTransaction(smsBody, messageDate);
+            if (transaction.getDate().equals(lastSmsDate)) {
+                // do not process already saved transaction
+                return;
+            }
             BankAccount bankAccount = bankAccountDao.getByNumber(smsSender);
             transaction.setBankAccount(bankAccount);
             transaction.setMessageDate(messageDate);
@@ -103,15 +108,15 @@ public class SmsService extends Service {
         try {
             Transaction lastTransaction = transactionDao.getLastTransaction();
             Long lastSmsDate = lastTransaction != null
-                    ? lastTransaction.getMessageDate().getMillis()
-                    : null;
-            saveFromReceived(lastSmsDate);
+                    ? lastTransaction.getMessageDate().getMillis() : null;
+            DateTime smsDate = lastTransaction != null ? lastTransaction.getDate() : null;
+            saveFromReceived(lastSmsDate, smsDate);
         } catch (SQLException e) {
             Log.e(TAG, "Error getting transaction", e);
         }
     }
 
-    void saveFromReceived(Long lastSmsDate) {
+    void saveFromReceived(Long lastSmsDate, DateTime smsDate) {
         String whereCondition = "address IN (" + getAddresses() + ")";
         if (lastSmsDate != null) {
             whereCondition += "AND date > " + lastSmsDate;
@@ -136,7 +141,7 @@ public class SmsService extends Service {
                     long timestamp = cursor.getLong(4);
                     String body = cursor.getString(5);
 
-                    saveTransaction(address, body, timestamp);
+                    saveTransaction(address, body, timestamp, smsDate);
                 }
             } finally {
                 cursor.close();

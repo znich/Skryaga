@@ -37,11 +37,11 @@ public class SmsMonitor extends BroadcastReceiver {
                     bodyText.append(message.getMessageBody());
                 }
                 String body = bodyText.toString();
-                Intent mIntent = new Intent(context, SmsService.class);
-                mIntent.putExtra(SmsService.SMS_SENDER, from);
-                mIntent.putExtra(SmsService.SMS_BODY, body);
-                mIntent.putExtra(SmsService.SMS_TIMESTAMP, messages[0].getTimestampMillis());
-                context.startService(mIntent);
+                Intent smsService = new Intent(context, SmsService.class);
+                smsService.putExtra(SmsService.SMS_SENDER, from);
+                smsService.putExtra(SmsService.SMS_BODY, body);
+                smsService.putExtra(SmsService.SMS_TIMESTAMP, messages[0].getTimestampMillis());
+                context.startService(smsService);
             }
         }
     }

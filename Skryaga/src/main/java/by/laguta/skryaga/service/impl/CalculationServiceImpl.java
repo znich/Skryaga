@@ -166,9 +166,11 @@ public class CalculationServiceImpl implements CalculationService {
 
     private DateTime calculateIncomeDate(DateTime start, Integer incomeDayOfMonth) {
         DateTime startWithIncomeDate = start.withDayOfMonth(incomeDayOfMonth);
-        DateTime result = startWithIncomeDate.isBefore(start)
-                ? startWithIncomeDate.plusMonths(1) : startWithIncomeDate;
-        return checkHolidays(result);
+        DateTime result = checkHolidays(startWithIncomeDate);
+        if (result.isAfter(start))  {
+            return result;
+        }
+        return checkHolidays(result.plusMonths(1));
     }
 
     private DateTime checkHolidays(DateTime date) {

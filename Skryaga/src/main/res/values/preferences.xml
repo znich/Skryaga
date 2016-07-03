@@ -3,4 +3,6 @@
     <string name="salaryDate">salaryDate</string>
     <string name="prepaidDate">prepaidDate</string>
     <string name="transactionsProcessed">transactionsProcessed</string>
+    <string name="createBackup">createBackup</string>
+    <string name="restoreBackup">restoreBackup</string>
 </resources>

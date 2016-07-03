@@ -6,10 +6,11 @@ import by.laguta.skryaga.service.SmsParser;
 import junit.framework.TestCase;
 import org.joda.time.DateTime;
 
-import static by.laguta.skryaga.dao.model.Currency.CurrencyType;
-import static by.laguta.skryaga.dao.model.Transaction.Type.*;
-
 import java.text.ParseException;
+
+import static by.laguta.skryaga.dao.model.Currency.CurrencyType;
+import static by.laguta.skryaga.dao.model.Transaction.Type.INCOME;
+import static by.laguta.skryaga.dao.model.Transaction.Type.SPENDING;
 
 public class SmsParserImplTest extends TestCase {
 
@@ -32,7 +33,7 @@ public class SmsParserImplTest extends TestCase {
                 "4.9141",
                 CurrencyType.BYR,
                 date,
-                -10000,
+                10000,
                 SPENDING,
                 "FEE FOR SMS-NOTIFICATION www.mmbank.by",
                 false,
@@ -57,7 +58,7 @@ public class SmsParserImplTest extends TestCase {
                 "4.9141",
                 CurrencyType.BYR,
                 date,
-                -200000,
+                200000,
                 SPENDING,
                 "SHOP \"SOSEDI\" MINSK",
                 false,
@@ -82,7 +83,7 @@ public class SmsParserImplTest extends TestCase {
                 "4.9141",
                 CurrencyType.USD,
                 date,
-                -100,
+                100,
                 SPENDING,
                 "ATMMMB HO05 ZERKALO MINSK",
                 false,
@@ -157,7 +158,7 @@ public class SmsParserImplTest extends TestCase {
                 "4.9141",
                 CurrencyType.BYR,
                 date,
-                -61500,
+                61500,
                 SPENDING,
                 "RESTORAN \"MAKDONALDS\" MINSK",
                 false,
@@ -171,66 +172,19 @@ public class SmsParserImplTest extends TestCase {
         checkParseSms(sms, expected);
     }
 
-    public void testParseSmsInternet() throws ParseException {
+    public void testParseSmsInternet() {
         // Given
         String sms =  "Karta 4.9141 - Oplata Internet (BYFLY,ZALA,Maksifon) 150000 BYR "
                 + "Kod: 76b44f2 Opr.N: 8578565";
-        Transaction expected = new Transaction(
-                null,
-                null, null,
-                "4.9141",
-                CurrencyType.BYR,
-                null,
-                150000d,
-                SPENDING,
-                "Internet (BYFLY,ZALA,Maksifon)",
-                false,
-                true);
 
         // When
         // Then
-        checkParseSms(sms, expected);
-    }
-
-    public void testParseSmsPhone() throws ParseException {
-        // Given
-        String sms =  "Karta 4.9141 - Oplata Telefon 29500 BYR Kod: 709d73d Opr.N: 8578528";
-        Transaction expected = new Transaction(
-                null,
-                null, null,
-                "4.9141",
-                CurrencyType.BYR,
-                null,
-                29500d,
-                SPENDING,
-                "Telefon",
-                false,
-                true);
-
-        // When
-        // Then
-        checkParseSms(sms, expected);
-    }
-
-    public void testParseSmsMobile() throws ParseException {
-        // Given
-        String sms =  "Karta 4.9141 - Oplata MTS po N telefona 15000 BYR "
-                + "Kod: c3d7a94 Opr.N: 8478278";
-        Transaction expected = new Transaction(
-                null,
-                null, null,
-                "4.9141",
-                CurrencyType.BYR,
-                null,
-                15000d,
-                SPENDING,
-                "MTS po N telefona",
-                false,
-                true);
-
-        // When
-        // Then
-        checkParseSms(sms, expected);
+        try {
+            checkParseSms(sms, null);
+            fail();
+        } catch (ParseException e) {
+            //ok
+        }
     }
 
     private void checkParseSms(String sms, Transaction expected) throws ParseException {

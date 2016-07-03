@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="exchange_rate_update_interval">60</integer>
+    <string name="denomination_date">01-07-2016</string>
+    <integer name="denomination_value">10000</integer>
+    <string name="backupDirectory">skryagaBackup</string>
+
 </resources>

@@ -6,11 +6,13 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import by.laguta.skryaga.R;
 import by.laguta.skryaga.activity.adapter.TransactionsAdapter;
@@ -26,9 +28,12 @@ import by.laguta.skryaga.service.util.Settings;
 import by.laguta.skryaga.service.util.UpdateTask;
 import com.joanzapata.iconify.IconDrawable;
 import com.joanzapata.iconify.fonts.MaterialCommunityIcons;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getName();
 
@@ -49,21 +54,23 @@ public class MainActivity extends Activity {
     private TextView restForToday;
     private TextView dailyAmount;
     private Toolbar toolbar;
-    private TextView toolbarText;
     private TextView goalAmount;
 
     private SwipeRefreshLayout refreshLayout;
     private RecyclerView transactionsList;
+    private Drawer drawer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setTheme(R.style.AppDefault);
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         bindViews();
 
         initToolbar();
+
+        initNavigationDrawer();
 
         initTransactionsList();
     }
@@ -80,7 +87,6 @@ public class MainActivity extends Activity {
 
         refreshLayout = (SwipeRefreshLayout) findViewById(R.id.transactionsRefresh);
         transactionsList = (RecyclerView) findViewById(R.id.transactions_view);
-
     }
 
     private void initToolbar() {
@@ -96,6 +102,19 @@ public class MainActivity extends Activity {
                         .actionBarSize());
         toolbar.setTitle(getString(R.string.toolbarTitle));
         toolbar.setTitleTextAppearance(this, R.style.toolbarStyle);
+    }
+
+    private void initNavigationDrawer() {
+        drawer = new DrawerBuilder()
+                .withActivity(this)
+                .withToolbar(toolbar)
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        return true;
+                    }
+                })
+                .build();
     }
 
     private void initTransactionsList() {
@@ -221,11 +240,8 @@ public class MainActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        /*getMenuInflater().inflate(R.menu.menu_main, menu);*/
         return true;
     }
-
 
     private class MainInfoUpdateTask extends UpdateTask<Void> {
 

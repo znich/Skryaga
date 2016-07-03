@@ -17,6 +17,14 @@
             android:key="@string/transactionsProcessed"
             android:defaultValue="false"/>
 
+    <by.laguta.skryaga.activity.preference.MakeBackupPreference
+            android:title="@string/backupData"
+            android:key="@string/createBackup"/>
+
+    <by.laguta.skryaga.activity.preference.RestoreDBPreference
+            android:title="@string/restoreData"
+            android:key="@string/restoreBackup"/>
+
 
     <!-- NOTE: EditTextPreference accepts EditText attributes. -->
     <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->

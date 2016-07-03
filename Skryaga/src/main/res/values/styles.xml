@@ -17,7 +17,8 @@
         <item name="android:textColor">@color/white</item>
         <item name="android:textSize">24sp</item>
     </style>
-
+    Error:Gradle: Execution failed for task ':Skryaga:processDebugManifest'.
+    > Error: [D:\Programms\Java\workspace\Skryaga\Skryaga\build\intermediates\exploded-aar\com.android.support\appcompat-v7\23.2.1\AndroidManifest.xml:21] Invalid instruction 'overrideLibrary', valid instructions are : REMOVE,REPLACE,STRICT
     <style name="mainInfo" parent="AppTheme">
         <item name="android:layout_height">130dp</item>
         <item name="android:paddingLeft">10dp</item>
@@ -62,7 +63,7 @@
         <item name="android:layout_centerVertical">true</item>
     </style>
     <style name="transactionItemDate" parent="transactionText">
-        <item name="android:width">140dp</item>
+        <item name="android:width">150dp</item>
         <item name="android:paddingRight">10dp</item>
     </style>
     <style name="transactionAmount" parent="transactionText">

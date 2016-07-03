@@ -31,18 +31,6 @@ public class Transaction {
             this.values = Arrays.asList(values);
         }
 
-        public static Type getByValue(String value) {
-            for (Type type : Type.values()) {
-                if (type.getValues().contains(value)) {
-                    return type;
-                }
-            }
-            return UNKNOWN;
-        }
-
-        private List<String> getValues() {
-            return values;
-        }
     }
 
     @DatabaseField(generatedId = true)
