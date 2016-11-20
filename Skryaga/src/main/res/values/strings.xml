@@ -28,6 +28,7 @@
     <string name="goalDialogTitle">Enter goal amount</string>
     <string name="rubles">р.</string>
     <string name="rateLabel">Rate:</string>
+    <string name="error_loading_rates">Error loading</string>
 
 
 </resources>

@@ -10,8 +10,6 @@ import by.laguta.skryaga.dao.model.*;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
 
 import java.sql.SQLException;
 
@@ -79,7 +77,7 @@ public class DBConnector extends OrmLiteSqliteOpenHelper {
             Log.e(TAG, "error upgrading db " + DATABASE_NAME + "from ver " + oldVersion);
             throw new RuntimeException(e);
         }*/
-        switch (newVersion) {
+        /*switch (newVersion) {
             case 3:
             case 4:
                 String denominationDateString = context.getString(R.string.denomination_date);
@@ -93,7 +91,7 @@ public class DBConnector extends OrmLiteSqliteOpenHelper {
                     Log.e(TAG, "Error updating denomination", e);
 
                 }
-        }
+        }*/
     }
 
     public TransactionDao getTransactionDao() {

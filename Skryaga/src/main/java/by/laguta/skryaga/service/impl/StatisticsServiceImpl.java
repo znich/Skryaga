@@ -64,16 +64,23 @@ public class StatisticsServiceImpl implements StatisticsService {
                 List<Transaction> transactions = transactionDao.getSpendingTransactionsBetween(
                         startDate, lastStatisticsDate);
 
+                SpendingStatistics spendingStatistics;
+
                 double[] amountArray = calculateAmounts(transactions);
 
-                double median = new Median().evaluate(amountArray);
+                if (amountArray.length == 0) {
+                    spendingStatistics = new SpendingStatistics(
+                            null, lastStatisticsDate, 0d, 0d, 0d);
+                } else {
+                    double median = new Median().evaluate(amountArray);
 
-                double average = roundAmount(new Mean().evaluate(amountArray));
+                    double average = roundAmount(new Mean().evaluate(amountArray));
 
-                double relative = roundAmount(new Mean().evaluate(new double[]{average, median}));
+                    double relative = roundAmount(new Mean().evaluate(new double[]{average, median}));
 
-                SpendingStatistics spendingStatistics = new SpendingStatistics(
-                        null, lastStatisticsDate, median, average, relative);
+                    spendingStatistics = new SpendingStatistics(
+                            null, lastStatisticsDate, median, average, relative);
+                }
 
                 if (lastStatistics != null && lastStatistics.getDate().equals(lastStatisticsDate)) {
                     lastStatistics.populate(spendingStatistics);

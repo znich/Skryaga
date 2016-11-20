@@ -47,7 +47,8 @@ public class MakeBackupPreference extends BackupPreference {
                 Toast.makeText(
                         getContext(),
                         "Backup Successful! \n Saved in " + backupDB.getPath(),
-                        Toast.LENGTH_SHORT).show();
+                        Toast.LENGTH_SHORT)
+                        .show();
 
             } else {
                 showErrorToast();

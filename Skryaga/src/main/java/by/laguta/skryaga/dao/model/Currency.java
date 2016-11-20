@@ -18,7 +18,7 @@ import java.util.List;
 public class Currency {
 
     public static enum CurrencyType {
-        BYR("BYR", "BLR"),
+        BYR("BYR", "BLR", "BYN"),
         USD("USD"),
         RUB("RUB"),
         EUR("EUR");

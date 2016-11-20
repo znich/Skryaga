@@ -24,7 +24,7 @@ import static by.laguta.skryaga.dao.model.Transaction.Type;
  */
 public class SmsParserImpl implements SmsParser {
 
-    private static final String DOUBLE_REGEXP = "[-\\+]?\\d+(?:\\.\\d+)?";
+    private static final String DOUBLE_REGEXP = "[-\\+]?\\d+(?:\\.\\d+|,\\d+)?";
 
     private static final String DATE_REGEXP =
             "(?:0[1-9]|[12][0-9]|3[01])[- /.](?:0[1-9]|1[012])[- /.](?:19|20)\\d\\d";
@@ -33,7 +33,8 @@ public class SmsParserImpl implements SmsParser {
 
     private static final String OPERATION_REGEXP = "[^\\d\\-\\+]+";
 
-    private static final String DESCRIPTION_REGEXP = "(?:(?!\\s+BLR\\s+|\\s+BYR\\s+).)*";
+    private static final String DESCRIPTION_REGEXP
+            = "(?:(?!\\s+BLR\\s+|\\s+BYR\\s+|\\s+BYN\\s+).)*";
 
     private static final String SMS_REGEXP = "^Karta"
             + "\\s+(" + DOUBLE_REGEXP + ")"         // 1 - card
@@ -43,7 +44,7 @@ public class SmsParserImpl implements SmsParser {
             + "\\s+(" + DOUBLE_REGEXP + ")"     // 5 - amount
             + "\\s+(\\S{3})"                    // 6 - currency
             + "\\s+(" + DESCRIPTION_REGEXP + ")"  // 7 - description
-            + "\\s+(?:BLR|BYR)"
+            + "\\s+(?:BLR|BYR|BYN)"
             + "\\s+([^\\.]*)"                      // 8 - result
             + "\\.\\s+Dostupno"
             + "\\s+(" + DOUBLE_REGEXP + ")"       // 9 - balance
@@ -67,6 +68,8 @@ public class SmsParserImpl implements SmsParser {
 
     private DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
 
+    public SmsParserImpl() {
+    }
 
     public Transaction parseToTransaction44(String message) throws ParseException {
         Matcher matcher = Pattern.compile(SMS_REGEXP).matcher(message);
@@ -77,7 +80,9 @@ public class SmsParserImpl implements SmsParser {
         return null;
     }
 
-    public Transaction parseToTransaction(String message, DateTime defaultDate) throws ParseException {
+    public Transaction parseToTransaction(String message, DateTime defaultDate)
+            throws ParseException {
+
         Matcher matcher = Pattern.compile(SMS_REGEXP).matcher(message);
         if (matcher.find()) {
             return getCommonTransaction(matcher, defaultDate);
@@ -138,12 +143,18 @@ public class SmsParserImpl implements SmsParser {
         return date != null ? new DateTime(date) : defaultDate;
     }
 
-    private Double getAmount(Matcher matcher, int group) {
-        return Math.abs(Double.valueOf(matcher.group(group)));
+    private Double getAmount(Matcher matcher, int group) throws ParseException {
+        Double parse = parseDouble(matcher, group);
+        return Math.abs(parse);
     }
 
-    private Type getOperationType(Matcher matcher, int group) {
-        return Double.valueOf(matcher.group(group)) > 0 ? Type.INCOME : Type.SPENDING;
+    private Double parseDouble(Matcher matcher, int group) throws ParseException {
+        String doubleString = matcher.group(group).replace(",", ".");
+        return Double.parseDouble(doubleString);
+    }
+
+    private Type getOperationType(Matcher matcher, int group) throws ParseException {
+        return parseDouble(matcher, group) > 0 ? Type.INCOME : Type.SPENDING;
     }
 
     private CurrencyType getCurrencyType(Matcher matcher, int group) {
@@ -156,8 +167,9 @@ public class SmsParserImpl implements SmsParser {
         return result.equals(TRANSACTION_RESULT_OK);
     }
 
-    private Balance getBalance(Matcher matcher, DateTime dateTime, int group) {
-        Double balanceAmount = Double.valueOf(matcher.group(group));
+    private Balance getBalance(Matcher matcher, DateTime dateTime, int group)
+            throws ParseException {
+        Double balanceAmount = parseDouble(matcher, group);
         return new Balance(null, balanceAmount, dateTime);
     }
 

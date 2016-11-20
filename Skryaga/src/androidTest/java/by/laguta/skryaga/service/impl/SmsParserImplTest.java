@@ -122,9 +122,59 @@ public class SmsParserImplTest extends TestCase {
         checkParseSms(sms, expected);
     }
 
+    public void testParseSmsIncomeDenomination() throws ParseException {
+        // Given
+        String sms = "Karta 4.9141 09.12.2014 11:56:05 Izmenenie ostatka +1600,24 BYN "
+                + "OK. Dostupno 2600,58 BYN";
+        DateTime date = new DateTime(2014, 12, 9, 11, 56, 5);
+        Transaction expected = new Transaction(
+                null,
+                null, null,
+                "4.9141",
+                CurrencyType.BYR,
+                date,
+                1600.24,
+                INCOME,
+                "",
+                false,
+                true);
+        Balance balance = new Balance(null, 2600.58d, date);
+        balance.setTransaction(expected);
+        expected.setBalance(balance);
+
+        // When
+        // Then
+        checkParseSms(sms, expected);
+    }
+
+    public void testParseSmsSpendingDenomination() throws ParseException {
+        // Given
+        String sms = "Karta 4.9141 07.07.2016 16:08:14 Retail -16,89 BYN UNIVERSAM \"SOSEDI\"" +
+                " MINSK BLR OK. Dostupno 604,15 BYN";
+        DateTime date = new DateTime(2016, 7, 7, 16, 8, 14);
+        Transaction expected = new Transaction(
+                null,
+                null, null,
+                "4.9141",
+                CurrencyType.BYR,
+                date,
+                16.89,
+                SPENDING,
+                "UNIVERSAM \"SOSEDI\" MINSK",
+                false,
+                true);
+        Balance balance = new Balance(null, 604.15d, date);
+        balance.setTransaction(expected);
+        expected.setBalance(balance);
+
+        // When
+        // Then
+        checkParseSms(sms, expected);
+    }
+
     public void testParseSmsReversal() throws ParseException {
         // Given
-        String sms =  "Karta 4.9141 30.11.2014 15:12:06 Reversal +200000 BYR \"KOMAROV.RYNOK\" "
+        String sms = "Karta 4.9141 30.11.2014 15:12:06 Reversal +200000 BYR \"KOMAROV.RYNOK\" "
                 + "BPSB ATM- MINSK BLR OK. Dostupno 2529407 BYR";
         DateTime date = new DateTime(2014, 11, 30, 15, 12, 6);
         Transaction expected = new Transaction(
@@ -174,7 +224,7 @@ public class SmsParserImplTest extends TestCase {
 
     public void testParseSmsInternet() {
         // Given
-        String sms =  "Karta 4.9141 - Oplata Internet (BYFLY,ZALA,Maksifon) 150000 BYR "
+        String sms = "Karta 4.9141 - Oplata Internet (BYFLY,ZALA,Maksifon) 150000 BYR "
                 + "Kod: 76b44f2 Opr.N: 8578565";
 
         // When

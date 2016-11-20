@@ -7,6 +7,7 @@ import by.laguta.skryaga.dao.ExchangeRateDao;
 import by.laguta.skryaga.dao.model.Currency;
 import by.laguta.skryaga.dao.model.ExchangeRate;
 import by.laguta.skryaga.service.ExchangeRateService;
+import by.laguta.skryaga.service.ExchangeRateUpdateException;
 import by.laguta.skryaga.service.UpdateExchangeRateListener;
 import by.laguta.skryaga.service.util.HelperFactory;
 import by.laguta.skryaga.service.util.UpdateTask;
@@ -70,7 +71,7 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
         return getSavedLowestSellExchangeRate();
     }
 
-    private Set<ExchangeRate> getExchangeRates() {
+    private Set<ExchangeRate> getExchangeRates() throws ExchangeRateUpdateException {
         Set<ExchangeRate> exchangeRateSet = new HashSet<ExchangeRate>();
         try {
             Document doc = getDocument();
@@ -86,6 +87,7 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
 
         } catch (Exception e) {
             Log.e(TAG, "Could not load page ", e);
+            throw new ExchangeRateUpdateException("Error loading exchange rates from server", e);
         }
         return exchangeRateSet;
     }
@@ -186,7 +188,6 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
     }
 
     private class UpdateRatesTask extends UpdateTask<ExchangeRate> {
-
         @Override
         protected ExchangeRate performInBackground() {
             if (lastUpdated != null) {
@@ -195,13 +196,17 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
                     return getSavedLowestSellExchangeRate();
                 }
             }
-            ExchangeRate lowestRate = getLowestRate();
-            saveOrUpdateLowestExchangeRate(lowestRate);
-            lastUpdated = new DateTime();
-            return lowestRate;
+            try {
+                ExchangeRate lowestRate = getLowestRate();
+                saveOrUpdateLowestExchangeRate(lowestRate);
+                lastUpdated = new DateTime();
+                return lowestRate;
+            } catch (ExchangeRateUpdateException e) {
+                return null;
+            }
         }
 
-        private ExchangeRate getLowestRate() {
+        private ExchangeRate getLowestRate() throws ExchangeRateUpdateException {
             Set<ExchangeRate> exchangeRates = getExchangeRates();
             return Collections.min(exchangeRates);
         }

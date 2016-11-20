@@ -192,6 +192,8 @@ public class MainActivity extends AppCompatActivity {
         if (lowestSellExchangeRate != null) {
             Double sellingRate = lowestSellExchangeRate.getSellingRate();
             exchangeRate.setText(CurrencyUtil.formatCurrencyByr(sellingRate, true));
+        } else {
+            exchangeRate.setText(getString(R.string.error_loading_rates));
         }
     }
 
