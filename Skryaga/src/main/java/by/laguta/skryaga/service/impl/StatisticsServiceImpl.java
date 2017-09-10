@@ -62,15 +62,16 @@ public class StatisticsServiceImpl implements StatisticsService {
                 DateTime startDate = lastStatisticsDate.minusDays(statisticsDaysPeriod);
 
                 List<Transaction> transactions = transactionDao.getSpendingTransactionsBetween(
-                        startDate, lastStatisticsDate);
+                        startDate, lastStatisticsDate.plusDays(1));
+
+                List<DateTime> statisticsDays = getStatisticsDays(startDate, lastStatisticsDate);
 
                 SpendingStatistics spendingStatistics;
 
-                double[] amountArray = calculateAmounts(transactions);
+                double[] amountArray = calculateAmounts(statisticsDays, transactions);
 
                 if (amountArray.length == 0) {
-                    spendingStatistics = new SpendingStatistics(
-                            null, lastStatisticsDate, 0d, 0d, 0d);
+                    spendingStatistics = new SpendingStatistics(null, lastStatisticsDate, 0d, 0d, 0d);
                 } else {
                     double median = new Median().evaluate(amountArray);
 
@@ -78,8 +79,7 @@ public class StatisticsServiceImpl implements StatisticsService {
 
                     double relative = roundAmount(new Mean().evaluate(new double[]{average, median}));
 
-                    spendingStatistics = new SpendingStatistics(
-                            null, lastStatisticsDate, median, average, relative);
+                    spendingStatistics = new SpendingStatistics(null, lastStatisticsDate, median, average, relative);
                 }
 
                 if (lastStatistics != null && lastStatistics.getDate().equals(lastStatisticsDate)) {
@@ -92,18 +92,33 @@ public class StatisticsServiceImpl implements StatisticsService {
                 lastStatisticsDate = lastStatisticsDate.plusDays(1);
             }
 
-
         } catch (SQLException e) {
             Log.e(TAG, "Error updating statistics", e);
         }
+    }
+
+    private List<DateTime> getStatisticsDays(DateTime startDate, DateTime lastStatisticsDate) {
+        ArrayList<DateTime> days = new ArrayList<DateTime>();
+        DateTime day = startDate;
+        while (!lastStatisticsDate.isBefore(day)) {
+            days.add(day);
+            day = day.plusDays(1);
+        }
+
+        return days;
     }
 
     private double roundAmount(double amount) {
         return new BigDecimal(amount).setScale(6, BigDecimal.ROUND_HALF_DOWN).doubleValue();
     }
 
-    private double[] calculateAmounts(List<Transaction> transactions) throws SQLException {
+    private double[] calculateAmounts(List<DateTime> statisticsDays, List<Transaction> transactions) throws SQLException {
         HashMap<DateTime, BigDecimal> spendingMap = new HashMap<DateTime, BigDecimal>();
+
+        for (DateTime statisticsDay : statisticsDays) {
+            spendingMap.put(statisticsDay, new BigDecimal(0d));
+        }
+
         for (Transaction transaction : transactions) {
             DateTime date = transaction.getDate().withTimeAtStartOfDay();
             BigDecimal amount = spendingMap.get(date);

@@ -65,7 +65,7 @@ public class TransactionDaoImpl extends OrmLiteBaseDAOImpl<Transaction, Long>
                 .and()
                 .ge(Transaction.DATE_COLUMN, date)
                 .and()
-                .le(Transaction.DATE_COLUMN, toDate)
+                .lt(Transaction.DATE_COLUMN, toDate)
                 .and()
                 .eq(Transaction.TYPE, Transaction.Type.SPENDING)
                 .and()
