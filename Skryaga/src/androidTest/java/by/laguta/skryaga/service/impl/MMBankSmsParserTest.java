@@ -12,14 +12,14 @@ import static by.laguta.skryaga.dao.model.Currency.CurrencyType;
 import static by.laguta.skryaga.dao.model.Transaction.Type.INCOME;
 import static by.laguta.skryaga.dao.model.Transaction.Type.SPENDING;
 
-public class SmsParserImplTest extends TestCase {
+public class MMBankSmsParserTest extends TestCase {
 
     private SmsParser smsParser;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        smsParser = new SmsParserImpl();
+        smsParser = new MMBankSmsParser();
     }
 
     public void testParseSmsFee() throws ParseException {

@@ -44,7 +44,7 @@ public class ServiceHelper {
 
     public SmsParser getSmsParser() {
         if (smsParser == null) {
-            smsParser = new SmsParserImpl();
+            smsParser = new MMBankSmsParser();
         }
         return smsParser;
     }

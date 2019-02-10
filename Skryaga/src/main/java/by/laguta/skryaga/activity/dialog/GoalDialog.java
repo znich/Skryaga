@@ -258,4 +258,8 @@ public class GoalDialog extends AlertDialog {
             }
         }
     }
+
+    public static interface GoalDialogListener {
+        void onGoalTransactionSaving(GoalTransactionUIModel goalTransaction);
+    }
 }

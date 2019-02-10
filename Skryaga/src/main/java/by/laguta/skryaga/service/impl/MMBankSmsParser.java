@@ -22,7 +22,7 @@ import static by.laguta.skryaga.dao.model.Transaction.Type;
  *
  * @author Anatoly
  */
-public class SmsParserImpl implements SmsParser {
+public class MMBankSmsParser implements SmsParser {
 
     private static final String DOUBLE_REGEXP = "[-\\+]?\\d+(?:\\.\\d+|,\\d+)?";
 
@@ -68,7 +68,7 @@ public class SmsParserImpl implements SmsParser {
 
     private DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
 
-    public SmsParserImpl() {
+    public MMBankSmsParser() {
     }
 
     public Transaction parseToTransaction44(String message) throws ParseException {
@@ -80,6 +80,7 @@ public class SmsParserImpl implements SmsParser {
         return null;
     }
 
+    @Override
     public Transaction parseToTransaction(String message, DateTime defaultDate)
             throws ParseException {
 

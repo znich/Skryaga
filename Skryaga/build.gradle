@@ -13,6 +13,11 @@ repositories {
 }
 
 android {
+
+    lintOptions {
+        abortOnError false
+    }
+
     compileSdkVersion 23
     buildToolsVersion "21.1.2"
 
@@ -20,8 +25,8 @@ android {
         applicationId "by.laguta.skryaga"
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.1"
     }
     buildTypes {
         release {

@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import by.laguta.skryaga.R;
 import by.laguta.skryaga.activity.dialog.GoalDialog;
-import by.laguta.skryaga.activity.dialog.GoalDialogListener;
 import by.laguta.skryaga.dao.GoalTransactionDao;
 import by.laguta.skryaga.dao.TransactionDao;
 import by.laguta.skryaga.dao.model.GoalTransaction;
@@ -174,8 +173,8 @@ public class TransactionsAdapter
             goalDialog.setGoalDialogListener(createGoalDialogListener(transaction));
         }
 
-        private GoalDialogListener createGoalDialogListener(final TransactionUIModel transaction) {
-            return new GoalDialogListener() {
+        private GoalDialog.GoalDialogListener createGoalDialogListener(final TransactionUIModel transaction) {
+            return new GoalDialog.GoalDialogListener() {
                 @Override
                 public void onGoalTransactionSaving(GoalTransactionUIModel goalTransaction) {
                     //TODO: AL  add saving exchange rate
