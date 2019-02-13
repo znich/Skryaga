@@ -205,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
     private void populateExchangeRate(ExchangeRate lowestSellExchangeRate) {
         if (lowestSellExchangeRate != null) {
             Double sellingRate = lowestSellExchangeRate.getSellingRate();
-            exchangeRate.setText(CurrencyUtil.formatCurrencyByn(sellingRate, true));
+            exchangeRate.setText(CurrencyUtil.formatCurrencyByn(sellingRate, true, 3));
         } else {
             exchangeRate.setText(getString(R.string.error_loading_rates));
         }

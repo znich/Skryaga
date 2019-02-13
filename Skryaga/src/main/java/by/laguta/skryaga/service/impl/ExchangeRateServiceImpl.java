@@ -97,29 +97,47 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
         return Jsoup.connect(url).timeout(3000).get();
     }
 
-    private ExchangeRate parseExchangeRate(Element element, DateTime date) {
-        Element name = element.select(getResourceString(R.string.ecopress_name_selector)).first();
-        if (name != null && name.children().isEmpty()) {
-            String bankName = name.text();
-            Element address = element.select(getResourceString(R.string.ecopress_address_selector))
-                    .first();
-            String bankAddress = "";
-            if (address != null) {
-                bankAddress = address.text();
-            }
+    private ExchangeRate parseExchangeRate(Element row, DateTime date) {
+        try {
+            Element name = row.select(getResourceString(R.string.ecopress_name_selector)).first();
+            if (name != null && name.children().isEmpty()) {
+                String bankName = name.text();
+                Element address = row.select(getResourceString(R.string.ecopress_address_selector))
+                        .first();
+                String bankAddress = "";
+                if (address != null) {
+                    bankAddress = address.text();
+                }
 
-            Element usdBuy = element.select(getResourceString(R.string.ecopress_buy_selector))
-                    .first();
-            Double buyCourse = Double.valueOf(usdBuy.text());
-            Double sellCourse = Double.valueOf(usdBuy.nextElementSibling().text());
-            return new ExchangeRate(
-                    null,
-                    date,
-                    Currency.CurrencyType.USD,
-                    bankName,
-                    bankAddress,
-                    buyCourse,
-                    sellCourse);
+                Element usdBuyElement = row.select(getResourceString(R.string.ecopress_buy_selector)).first();
+                Double buyCourse = getCourse(usdBuyElement);
+                Element usdSellElement = usdBuyElement.nextElementSibling();
+                Double sellCourse = getCourse(usdSellElement);
+                return new ExchangeRate(
+                        null,
+                        date,
+                        Currency.CurrencyType.USD,
+                        bankName,
+                        bankAddress,
+                        buyCourse,
+                        sellCourse);
+            }
+            return null;
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    private Double getCourse(Element courseEleemnt) {
+        Elements usdBuyChildNodes = courseEleemnt.children();
+        if (usdBuyChildNodes.isEmpty()) {
+            return Double.valueOf(courseEleemnt.text());
+        } else {
+            for (Element element : usdBuyChildNodes) {
+                if (element.tagName().equals("strong")) {
+                    return   Double.valueOf(element.text());
+                }
+            }
         }
         return null;
     }

@@ -80,7 +80,11 @@ public class CurrencyUtil {
     }
 
     public static String formatCurrencyByn(Double totalAmount, boolean addCurrencySymbol) {
-        String currencyString = formatCurrency(totalAmount, 2);
+        return formatCurrencyByn(totalAmount, addCurrencySymbol, 2);
+    }
+
+    public static String formatCurrencyByn(Double totalAmount, boolean addCurrencySymbol, int fractionDigits) {
+        String currencyString = formatCurrency(totalAmount, fractionDigits);
         return addCurrencySymbol ? currencyString + "р" : currencyString;
     }
 
