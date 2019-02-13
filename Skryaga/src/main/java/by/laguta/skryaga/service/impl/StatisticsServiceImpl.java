@@ -185,8 +185,9 @@ public class StatisticsServiceImpl implements StatisticsService {
                 .parseDateTime(denominationDateString);
         int denominationValue = Integer.parseInt(context.getString(R.string.denomination_value));
 
+        Double transactionAmount = transaction.getAmount() != null ? transaction.getAmount() : 0;
         BigDecimal amount = transaction.isByrCurrency()
-                ? new BigDecimal(transaction.getAmount())
+                ? new BigDecimal(transactionAmount)
                 : getAmountForForeignCurrency(transaction);
 
         DateTime transactionDate = transaction.getDate().withTimeAtStartOfDay();

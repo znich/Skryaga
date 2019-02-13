@@ -138,8 +138,15 @@ public class TransactionsAdapter
                     : context.getText(R.string.basketUnFill));
 
             TextView amountView = (TextView) itemView.findViewById(R.id.transactionAmount);
-            amountView.setText(CurrencyUtil.formatCurrency(
-                    transaction.getAmount(), transaction.getCurrencyType()));
+            Double amount = transaction.getAmount();
+
+            String amountText;
+            if (amount != null) {
+                amountText = CurrencyUtil.formatCurrency(amount, transaction.getCurrencyType());
+            } else {
+                amountText = context.getString(R.string.undefined_balance);
+            }
+            amountView.setText(amountText);
 
         }
 

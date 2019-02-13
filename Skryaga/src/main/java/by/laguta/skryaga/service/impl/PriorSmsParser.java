@@ -1,5 +1,7 @@
 package by.laguta.skryaga.service.impl;
 
+import android.content.Context;
+import by.laguta.skryaga.R;
 import by.laguta.skryaga.dao.model.Balance;
 import by.laguta.skryaga.dao.model.Currency;
 import by.laguta.skryaga.dao.model.Transaction;
@@ -69,6 +71,12 @@ public class PriorSmsParser extends BaseParser implements SmsParser {
     private DateFormat dateFormatYear = new SimpleDateFormat(DATE_FORMAT_YEAR);
     private DateFormat dateFormatShort = new SimpleDateFormat(DATE_FORMAT_SHORT);
 
+    private Context context;
+
+    public PriorSmsParser(Context context) {
+        this.context = context;
+    }
+
     @Override
     public Transaction parseToTransaction(String message, DateTime defaultDate) throws ParseException {
         Matcher matcher = Pattern.compile(SMS_SPENDING_REGEXP).matcher(message);
@@ -120,9 +128,9 @@ public class PriorSmsParser extends BaseParser implements SmsParser {
                 null,
                 null,
                 dateTime,
-                0,
+                null,
                 Transaction.Type.INCOME,
-                "",
+                context.getString(R.string.unknown_income_transaction),
                 false,
                 true);
         transaction.setBalance(balance);
@@ -153,7 +161,7 @@ public class PriorSmsParser extends BaseParser implements SmsParser {
                 dateTime,
                 getAmount(matcher, 4),
                 Transaction.Type.INCOME,
-                "",
+                context.getString(R.string.unknown_income_transaction),
                 false,
                 true);
         transaction.setBalance(balance);
@@ -169,7 +177,15 @@ public class PriorSmsParser extends BaseParser implements SmsParser {
         } catch (ParseException e) {
             return defaultDate;
         }
-        return date != null ? new DateTime(date).withYear(defaultDate.getYear()) : defaultDate;
+        if (date != null) {
+            DateTime dateTime = new DateTime(date).withYear(defaultDate.getYear());
+
+            if (dateTime.compareTo(defaultDate) > 0) {
+                dateTime = dateTime.withYear(defaultDate.getYear() - 1);
+            }
+            return dateTime;
+        }
+        return defaultDate;
     }
 
     private Transaction getRefundTransaction(Matcher matcher, DateTime defaultDate) throws ParseException {

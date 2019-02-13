@@ -45,7 +45,7 @@ public class ServiceHelper {
         //TODO: choose parser
 
         if (smsParser == null) {
-            smsParser = new PriorSmsParser();
+            smsParser = new PriorSmsParser(context);
         }
         return smsParser;
     }

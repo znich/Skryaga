@@ -1,10 +1,10 @@
 package by.laguta.skryaga.service.impl;
 
+import android.test.AndroidTestCase;
 import by.laguta.skryaga.dao.model.Balance;
 import by.laguta.skryaga.dao.model.Currency;
 import by.laguta.skryaga.dao.model.Transaction;
 import by.laguta.skryaga.service.SmsParser;
-import junit.framework.TestCase;
 import org.joda.time.DateTime;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -15,13 +15,13 @@ import static by.laguta.skryaga.dao.model.Transaction.Type.INCOME;
 import static by.laguta.skryaga.dao.model.Transaction.Type.SPENDING;
 
 @RunWith(JUnit4.class)
-public class PriorSmsParserTest extends TestCase {
+public class PriorSmsParserTest extends AndroidTestCase {
     private SmsParser smsParser;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        smsParser = new PriorSmsParser();
+        smsParser = new PriorSmsParser(mContext);
     }
 
     public void testParseSmsOplata() throws ParseException {
@@ -122,8 +122,8 @@ public class PriorSmsParserTest extends TestCase {
 
     public void testParseSmsIncome() throws ParseException {
         // Given
-        String sms = "Priorbank 20/12 16:40. Na vashu kartu zachisleno 659.41 BYN. Dostupnaja summa: 692.29 BYN. Spravka: 80172899292";
-        DateTime date = new DateTime(2019, 12, 20, 16, 40, 0);
+        String sms = "Priorbank 20/01 16:40. Na vashu kartu zachisleno 659.41 BYN. Dostupnaja summa: 692.29 BYN. Spravka: 80172899292";
+        DateTime date = new DateTime(2019, 1, 20, 16, 40, 0);
         Transaction expected = new Transaction(
                 null,
                 null, null,
@@ -132,7 +132,7 @@ public class PriorSmsParserTest extends TestCase {
                 date,
                 659.41,
                 INCOME,
-                "",
+                "Income operation",
                 false,
                 true);
         Balance balance = new Balance(null, 692.29, date);
@@ -141,7 +141,7 @@ public class PriorSmsParserTest extends TestCase {
 
         // When
         // Then
-        checkParseSms(sms, expected);
+        checkParseSms(sms, expected, new DateTime(2019, 2, 13, 16, 40, 0));
     }
 
     public void testParseSmsRefund() throws ParseException {
@@ -171,16 +171,16 @@ public class PriorSmsParserTest extends TestCase {
     public void testParseEmptyBalance() throws ParseException {
         // Given
         String sms = "Priorbank 21/09 11:44. Informiruem o zachislenii na vashu kartu. Spravka: 8017289929";
-        DateTime date = new DateTime(2019, 9, 21, 11, 44, 0);
+        DateTime date = new DateTime(2018, 9, 21, 11, 44, 0);
         Transaction expected = new Transaction(
                 null,
                 null, null,
                 null,
                 null,
                 date,
-                0,
+                null,
                 INCOME,
-                "",
+                "Income operation",
                 false,
                 true);
         Balance balance = new Balance(null, null, date);
@@ -189,7 +189,7 @@ public class PriorSmsParserTest extends TestCase {
 
         // When
         // Then
-        checkParseSms(sms, expected, date);
+        checkParseSms(sms, expected, new DateTime(2019, 2, 13, 0, 44, 0));
     }
 
     private void checkParseSms(String sms, Transaction expected, DateTime defaultDate) throws ParseException {

@@ -44,18 +44,18 @@ public class Transaction {
     @DatabaseField(canBeNull = false, foreign = true, columnName = BANK_ACCOUNT)
     private BankAccount bankAccount;
 
-    @DatabaseField(canBeNull = false, width = 30, columnName = "cardNumber")
+    @DatabaseField(canBeNull = true, width = 30, columnName = "cardNumber")
     private String cardNumber;
 
-    @DatabaseField(canBeNull = false, dataType = DataType.ENUM_STRING, columnName = "currencyType")
+    @DatabaseField(canBeNull = true, dataType = DataType.ENUM_STRING, columnName = "currencyType")
     private CurrencyType currencyType;
 
     public static final String DATE_COLUMN = "date";
     @DatabaseField(canBeNull = false, dataType = DataType.DATE_TIME, columnName = DATE_COLUMN)
     private DateTime date;
 
-    @DatabaseField(canBeNull = false, columnName = "amount")
-    private double amount;
+    @DatabaseField(canBeNull = true, columnName = "amount")
+    private Double amount;
 
     public static final String TYPE = "type";
     @DatabaseField(canBeNull = false, dataType = DataType.ENUM_STRING, columnName = TYPE)
@@ -91,7 +91,7 @@ public class Transaction {
             String cardNumber,
             CurrencyType currency,
             DateTime date,
-            double amount,
+            Double amount,
             Type type,
             String message,
             boolean accumulation,
@@ -107,7 +107,7 @@ public class Transaction {
             String cardNumber,
             CurrencyType currency,
             DateTime date,
-            double amount,
+            Double amount,
             Type type,
             String message,
             String comment,
@@ -179,11 +179,11 @@ public class Transaction {
         this.date = date;
     }
 
-    public double getAmount() {
+    public Double getAmount() {
         return amount;
     }
 
-    public void setAmount(double amount) {
+    public void setAmount(Double amount) {
         this.amount = amount;
     }
 
@@ -259,7 +259,7 @@ public class Transaction {
         Transaction that = (Transaction) o;
 
         if (accumulation != that.accumulation) return false;
-        if (Double.compare(that.amount, amount) != 0) return false;
+        if (amount != null ? !amount.equals(that.amount) : that.amount != null) return false;
         if (approved != that.approved) return false;
         if (balance != null ? !balance.equals(that.balance) : that.balance != null) return false;
         if (bankAccount != null ? !bankAccount.equals(that.bankAccount) : that.bankAccount != null)
@@ -292,7 +292,7 @@ public class Transaction {
         result = 31 * result + (cardNumber != null ? cardNumber.hashCode() : 0);
         result = 31 * result + (currencyType != null ? currencyType.hashCode() : 0);
         result = 31 * result + (date != null ? date.hashCode() : 0);
-        temp = Double.doubleToLongBits(amount);
+        temp = amount != null ? Double.doubleToLongBits(amount) : 0;
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         result = 31 * result + (type != null ? type.hashCode() : 0);
         result = 31 * result + (message != null ? message.hashCode() : 0);

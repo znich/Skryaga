@@ -69,7 +69,9 @@ public class TransactionDaoImpl extends OrmLiteBaseDAOImpl<Transaction, Long>
     private BigDecimal getSumAmount(List<Transaction> transactions) {
         BigDecimal result = new BigDecimal(0);
         for (Transaction transaction : transactions) {
-            result = result.add(new BigDecimal(transaction.getAmount()));
+            if (transaction.getAmount() != null) {
+                result = result.add(new BigDecimal(transaction.getAmount()));
+            }
         }
         return result;
     }

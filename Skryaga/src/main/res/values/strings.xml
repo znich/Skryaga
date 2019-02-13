@@ -34,6 +34,7 @@
     <string name="undefined_balance">Undefined</string>
     <string name="dialog_balance_title">USSD Balance</string>
     <string name="dialog_balance_message">Do you really want to sent USSD request to update your balance?</string>
+    <string name="unknown_income_transaction">Income operation</string>
 
 
 </resources>

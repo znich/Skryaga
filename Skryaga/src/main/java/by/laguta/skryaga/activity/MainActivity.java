@@ -193,11 +193,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void populateTotalAmount(MainInfoModel mainInfoModel) {
         Double totalAmount = mainInfoModel.getTotalAmount();
-        String text;
+        CharSequence text;
         if (totalAmount != null) {
             text = CurrencyUtil.formatCurrencyByn(totalAmount, true);
         } else {
-            text = getString(R.string.undefined_balance);
+            text = getText(R.string.undefined_balance);
         }
         totalAmountField.setText(text);
     }
