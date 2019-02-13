@@ -23,6 +23,9 @@ public class BankAccount {
     @DatabaseField(canBeNull = false, width = 500, columnName = "label")
     private String label;
 
+    @DatabaseField(canBeNull = true, width = 500, columnName = "default_card")
+    private String defaultCard;
+
     public BankAccount() {
     }
 
@@ -54,5 +57,13 @@ public class BankAccount {
 
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    public String getDefaultCard() {
+        return defaultCard;
+    }
+
+    public void setDefaultCard(String defaultCard) {
+        this.defaultCard = defaultCard;
     }
 }

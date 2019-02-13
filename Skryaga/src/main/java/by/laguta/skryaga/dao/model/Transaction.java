@@ -40,7 +40,8 @@ public class Transaction {
     @DatabaseField(canBeNull = false, dataType = DataType.DATE_TIME, columnName = MESSAGE_DATE)
     private DateTime messageDate;
 
-    @DatabaseField(canBeNull = false, foreign = true, columnName = "bank_account")
+    public static final String BANK_ACCOUNT = "bank_account";
+    @DatabaseField(canBeNull = false, foreign = true, columnName = BANK_ACCOUNT)
     private BankAccount bankAccount;
 
     @DatabaseField(canBeNull = false, width = 30, columnName = "cardNumber")
@@ -90,7 +91,8 @@ public class Transaction {
             String cardNumber,
             CurrencyType currency,
             DateTime date,
-            double amount, Type type,
+            double amount,
+            Type type,
             String message,
             boolean accumulation,
             boolean approved) {

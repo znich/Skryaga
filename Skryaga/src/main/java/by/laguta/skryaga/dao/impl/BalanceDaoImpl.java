@@ -19,7 +19,6 @@ public class BalanceDaoImpl extends OrmLiteBaseDAOImpl<Balance, Long> implements
 
     @Override
     public Balance getCurrentBalance() throws SQLException {
-
         QueryBuilder<Balance, Long> queryBuilder = queryBuilder();
         queryBuilder.orderBy(Balance.DATE, false);
         queryBuilder.limit(1L);

@@ -25,7 +25,8 @@
                     android:text=""
                     android:id="@+id/total_amount_field"
                     android:layout_gravity="center"
-                    style="@style/mainInfoText"/>
+                    style="@style/mainInfoText"
+                    android:onClick="updateBalance"/>
         </LinearLayout>
         <LinearLayout
                 android:layout_width="match_parent"

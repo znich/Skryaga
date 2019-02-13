@@ -29,4 +29,5 @@ public interface TransactionDao extends Dao<Transaction, Long> {
 
     List<Transaction> getTransactionsList() throws  SQLException;
 
+    Transaction getLastTransaction(String account) throws SQLException;
 }

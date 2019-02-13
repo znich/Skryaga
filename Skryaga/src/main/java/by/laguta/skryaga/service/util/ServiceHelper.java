@@ -1,10 +1,7 @@
 package by.laguta.skryaga.service.util;
 
 import android.content.Context;
-import by.laguta.skryaga.service.CalculationService;
-import by.laguta.skryaga.service.ExchangeRateService;
-import by.laguta.skryaga.service.SmsParser;
-import by.laguta.skryaga.service.StatisticsService;
+import by.laguta.skryaga.service.*;
 import by.laguta.skryaga.service.impl.*;
 
 public class ServiceHelper {
@@ -14,6 +11,8 @@ public class ServiceHelper {
     private ExchangeRateService exchangeRateService;
     private SmsParser smsParser;
     private StatisticsService statisticsService;
+    private BalanceService balanceService;
+    private UssdParser ussdParser;
 
     private Context context;
 
@@ -42,9 +41,11 @@ public class ServiceHelper {
         return exchangeRateService;
     }
 
-    public SmsParser getSmsParser() {
+    public SmsParser getSmsParser(String account) {
+        //TODO: choose parser
+
         if (smsParser == null) {
-            smsParser = new MMBankSmsParser();
+            smsParser = new PriorSmsParser();
         }
         return smsParser;
     }
@@ -54,5 +55,19 @@ public class ServiceHelper {
             statisticsService = new StatisticsServiceImpl(context);
         }
         return statisticsService;
+    }
+
+    public BalanceService getBalanceService() {
+        if (balanceService == null) {
+            balanceService = new BalanceServiceImpl(context);
+        }
+        return balanceService;
+    }
+
+    public UssdParser getUssdParser() {
+        if (ussdParser == null) {
+            ussdParser = new UssdParserImpl();
+        }
+        return ussdParser;
     }
 }

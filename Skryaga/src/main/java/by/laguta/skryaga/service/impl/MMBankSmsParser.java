@@ -22,14 +22,7 @@ import static by.laguta.skryaga.dao.model.Transaction.Type;
  *
  * @author Anatoly
  */
-public class MMBankSmsParser implements SmsParser {
-
-    private static final String DOUBLE_REGEXP = "[-\\+]?\\d+(?:\\.\\d+|,\\d+)?";
-
-    private static final String DATE_REGEXP =
-            "(?:0[1-9]|[12][0-9]|3[01])[- /.](?:0[1-9]|1[012])[- /.](?:19|20)\\d\\d";
-
-    private static final String TIME_REGEXP = "(?:[0-1]\\d|2[0-3])(?::[0-5]\\d){2}";
+public class MMBankSmsParser extends BaseParser implements SmsParser {
 
     private static final String OPERATION_REGEXP = "[^\\d\\-\\+]+";
 
@@ -81,9 +74,7 @@ public class MMBankSmsParser implements SmsParser {
     }
 
     @Override
-    public Transaction parseToTransaction(String message, DateTime defaultDate)
-            throws ParseException {
-
+    public Transaction parseToTransaction(String message, DateTime defaultDate) throws ParseException {
         Matcher matcher = Pattern.compile(SMS_REGEXP).matcher(message);
         if (matcher.find()) {
             return getCommonTransaction(matcher, defaultDate);
@@ -147,11 +138,6 @@ public class MMBankSmsParser implements SmsParser {
     private Double getAmount(Matcher matcher, int group) throws ParseException {
         Double parse = parseDouble(matcher, group);
         return Math.abs(parse);
-    }
-
-    private Double parseDouble(Matcher matcher, int group) throws ParseException {
-        String doubleString = matcher.group(group).replace(",", ".");
-        return Double.parseDouble(doubleString);
     }
 
     private Type getOperationType(Matcher matcher, int group) throws ParseException {

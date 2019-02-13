@@ -57,12 +57,23 @@ public class DBConnector extends OrmLiteSqliteOpenHelper {
             TableUtils.createTable(connectionSource, ExchangeRate.class);
             TableUtils.createTable(connectionSource, GoalTransaction.class);
             TableUtils.createTable(connectionSource, UserSettings.class);
-            BankAccount bankAccount = new BankAccount(
-                    null, context.getString(R.string.bank_accounts), "");
-            getBankAccountDao().create(bankAccount);
+            initBankAccounts();
         } catch (SQLException e) {
             Log.e(TAG, "error creating DB " + DATABASE_NAME);
             throw new RuntimeException(e);
+        }
+    }
+
+    private void initBankAccounts() throws SQLException {
+        String[] accounts = context.getResources().getStringArray(R.array.bank_accounts);
+        for (String account : accounts) {
+            BankAccount bankAccount = new BankAccount(null, account, "");
+            int identifier = context.getResources().getIdentifier(account + "_bank_card", "string", context.getPackageName());
+            if (identifier != 0) {
+                String bankCard = context.getResources().getString(identifier);
+                bankAccount.setDefaultCard(bankCard);
+            }
+            getBankAccountDao().create(bankAccount);
         }
     }
 
@@ -98,6 +109,7 @@ public class DBConnector extends OrmLiteSqliteOpenHelper {
         if (transactionDao == null) {
             try {
                 transactionDao = new TransactionDaoImpl(getConnectionSource());
+                ((TransactionDaoImpl) transactionDao).setBankAccountDao(getBankAccountDao());
             } catch (SQLException e) {
                 Log.e(TAG, "Error creating " + TransactionDaoImpl.class.getName(), e);
             }

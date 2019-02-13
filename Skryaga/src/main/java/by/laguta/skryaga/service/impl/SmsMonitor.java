@@ -31,7 +31,7 @@ public class SmsMonitor extends BroadcastReceiver {
             }
             String from = messages[0].getDisplayOriginatingAddress();
             //TODO: AL add check from db bank account
-            if (getStringResource(R.string.bank_accounts).contains(from)) {
+            if (shouldBeChecked(from)) {
                 StringBuilder bodyText = new StringBuilder();
                 for (SmsMessage message : messages) {
                     bodyText.append(message.getMessageBody());
@@ -46,8 +46,13 @@ public class SmsMonitor extends BroadcastReceiver {
         }
     }
 
-
-    private String getStringResource(int id) {
-        return context.getResources().getString(id);
+    private boolean shouldBeChecked(String from) {
+        String[] accounts = context.getResources().getStringArray(R.array.bank_accounts);
+        for (String account : accounts) {
+            if (account.equalsIgnoreCase(from)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

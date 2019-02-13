@@ -65,7 +65,7 @@ public class SmsService extends Service {
 
     void initializeServices() {
         HelperFactory.initialize(getApplicationContext());
-        smsParser = HelperFactory.getServiceHelper().getSmsParser();
+        smsParser = HelperFactory.getServiceHelper().getSmsParser(null);
         bankAccountDao = HelperFactory.getDaoHelper().getBankAccountDao();
         transactionDao = HelperFactory.getDaoHelper().getTransactionDao();
         balanceDao = HelperFactory.getDaoHelper().getBalanceDao();
@@ -84,10 +84,11 @@ public class SmsService extends Service {
 
     private void saveTransaction(
             String smsSender, String smsBody, Long smsDate, DateTime lastSmsDate) {
+
         try {
             DateTime messageDate = new DateTime(new Date(smsDate)).withMillisOfSecond(0);
             Transaction transaction = smsParser.parseToTransaction(smsBody, messageDate);
-            if (transaction.getDate().equals(lastSmsDate)) {
+            if (transaction == null || transaction.getDate().equals(lastSmsDate)) {
                 // do not process already saved transaction
                 return;
             }
@@ -96,6 +97,7 @@ public class SmsService extends Service {
             transaction.setMessageDate(messageDate);
             balanceDao.create(transaction.getBalance());
             transactionDao.create(transaction);
+            balanceDao.update(transaction.getBalance());
         } catch (ParseException e) {
             Log.e(TAG, "Error parsing message: \n" + smsBody);
         } catch (SQLException e) {
@@ -106,18 +108,24 @@ public class SmsService extends Service {
 
     private void updateTransactionsPrivate() {
         try {
-            Transaction lastTransaction = transactionDao.getLastTransaction();
-            Long lastSmsDate = lastTransaction != null
-                    ? lastTransaction.getMessageDate().getMillis() : null;
-            DateTime smsDate = lastTransaction != null ? lastTransaction.getDate() : null;
-            saveFromReceived(lastSmsDate, smsDate);
+            updateComplete = false;
+            String[] accounts = getResources().getStringArray(R.array.bank_accounts);
+            for (String account : accounts) {
+                Transaction lastTransaction = transactionDao.getLastTransaction(account);
+                Long lastSmsDate = lastTransaction != null
+                        ? lastTransaction.getMessageDate().getMillis() : null;
+                DateTime smsDate = lastTransaction != null ? lastTransaction.getDate() : null;
+                saveFromReceived(account, lastSmsDate, smsDate);
+            }
         } catch (SQLException e) {
             Log.e(TAG, "Error getting transaction", e);
+        } finally {
+            updateComplete = true;
         }
     }
 
-    void saveFromReceived(Long lastSmsDate, DateTime smsDate) {
-        String whereCondition = "address IN (" + getAddresses() + ")";
+    private void saveFromReceived(String account, Long lastSmsDate, DateTime smsDate) {
+        String whereCondition = "address == ('" + account + "')";
         if (lastSmsDate != null) {
             whereCondition += "AND date > " + lastSmsDate;
         }
@@ -131,7 +139,6 @@ public class SmsService extends Service {
                 sortOrder);
         if (cursor != null) {
             try {
-                updateComplete = false;
                 while (cursor.moveToNext()) {
                     long messageId = cursor.getLong(0);
                     long threadId = cursor.getLong(1);
@@ -145,19 +152,8 @@ public class SmsService extends Service {
                 }
             } finally {
                 cursor.close();
-                updateComplete = true;
             }
         }
-    }
-
-    private String getAddresses() {
-        String[] accounts = getStringResource(R.string.bank_accounts).split(",");
-        String inSelection = "";
-        for (String account : accounts) {
-            inSelection += "'" + account + "',";
-        }
-        inSelection = inSelection.replaceAll(",$", "");
-        return inSelection;
     }
 
     private String getStringResource(int id) {

@@ -1,6 +1,8 @@
 package by.laguta.skryaga.dao.impl;
 
+import by.laguta.skryaga.dao.BankAccountDao;
 import by.laguta.skryaga.dao.TransactionDao;
+import by.laguta.skryaga.dao.model.BankAccount;
 import by.laguta.skryaga.dao.model.Transaction;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
@@ -21,13 +23,30 @@ import java.util.List;
 public class TransactionDaoImpl extends OrmLiteBaseDAOImpl<Transaction, Long>
         implements TransactionDao {
 
+    private BankAccountDao bankAccountDao;
+
     public TransactionDaoImpl(ConnectionSource connectionSource) throws SQLException {
         super(connectionSource, Transaction.class);
+    }
+
+    public void setBankAccountDao(BankAccountDao bankAccountDao) {
+        this.bankAccountDao = bankAccountDao;
     }
 
     @Override
     public Transaction getLastTransaction() throws SQLException {
         QueryBuilder<Transaction, Long> queryBuilder = queryBuilder();
+        queryBuilder.orderBy(Transaction.MESSAGE_DATE, false).limit(1L);
+        PreparedQuery<Transaction> preparedQuery = queryBuilder.prepare();
+        return queryForFirst(preparedQuery);
+    }
+
+    @Override
+    public Transaction getLastTransaction(String account) throws SQLException {
+        QueryBuilder<Transaction, Long> queryBuilder = queryBuilder();
+        QueryBuilder<BankAccount, Long> bankAccountQueryBuilder = bankAccountDao.queryBuilder();
+        bankAccountQueryBuilder.where().like(BankAccount.PHONE_NUMBER, formatLike(account));
+        queryBuilder.join(bankAccountQueryBuilder);
         queryBuilder.orderBy(Transaction.MESSAGE_DATE, false).limit(1L);
         PreparedQuery<Transaction> preparedQuery = queryBuilder.prepare();
         return queryForFirst(preparedQuery);

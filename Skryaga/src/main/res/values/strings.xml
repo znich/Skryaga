@@ -25,10 +25,15 @@
     <string name="backupData">Create backup</string>
     <string name="restoreData">Restore backup</string>
     <string name="statisticsUpdating">Statistics is being updated</string>
+    <string name="balanceUpdating">Balance is being updated</string>
     <string name="goalDialogTitle">Enter goal amount</string>
     <string name="rubles">р.</string>
     <string name="rateLabel">Rate:</string>
     <string name="error_loading_rates">Error loading</string>
+    <string name="ussd_service_description">This service records pop ups sent by your mobile operator, and saves them in XXXX App. It is absolutely safe to use.</string>
+    <string name="undefined_balance">Undefined</string>
+    <string name="dialog_balance_title">USSD Balance</string>
+    <string name="dialog_balance_message">Do you really want to sent USSD request to update your balance?</string>
 
 
 </resources>

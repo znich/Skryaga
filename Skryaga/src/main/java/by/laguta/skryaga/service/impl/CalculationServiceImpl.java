@@ -116,7 +116,9 @@ public class CalculationServiceImpl implements CalculationService {
                 reserve = reserve.add(getPrepaidShortage(spendingStatistics));
             }
 
-            BigDecimal byrGoal = new BigDecimal(getTotalAmount()).add(reserve.negate());
+            Double totalAmount = getTotalAmount();
+            totalAmount = totalAmount != null ? totalAmount : 0d;
+            BigDecimal byrGoal = new BigDecimal(totalAmount).add(reserve.negate());
 
             ExchangeRate exchangeRate = exchangeRateService.getSavedLowestSellExchangeRate();
 

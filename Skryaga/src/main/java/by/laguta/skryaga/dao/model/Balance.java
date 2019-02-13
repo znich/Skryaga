@@ -18,7 +18,7 @@ public class Balance {
     @DatabaseField(generatedId = true)
     private Long id;
 
-    @DatabaseField(canBeNull = false, columnName = "amount")
+    @DatabaseField(canBeNull = true, columnName = "amount")
     private Double amount;
 
     public final static String DATE = "date";
@@ -95,5 +95,14 @@ public class Balance {
         result = 31 * result + (amount != null ? amount.hashCode() : 0);
         result = 31 * result + (date != null ? date.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Balance{" +
+                "id=" + id +
+                ", amount=" + amount +
+                ", date=" + date +
+                '}';
     }
 }

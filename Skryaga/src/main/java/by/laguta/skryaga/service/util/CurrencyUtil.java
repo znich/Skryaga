@@ -75,11 +75,11 @@ public class CurrencyUtil {
             case EUR:
                 return formatCurrencyEur(amount, addCurrencySymbol);
             default:
-                return formatCurrencyByr(amount, addCurrencySymbol);
+                return formatCurrencyByn(amount, addCurrencySymbol);
         }
     }
 
-    public static String formatCurrencyByr(Double totalAmount, boolean addCurrencySymbol) {
+    public static String formatCurrencyByn(Double totalAmount, boolean addCurrencySymbol) {
         String currencyString = formatCurrency(totalAmount, 2);
         return addCurrencySymbol ? currencyString + "р" : currencyString;
     }

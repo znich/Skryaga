@@ -1,11 +1,13 @@
 package by.laguta.skryaga.activity;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -47,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
 
     private StatisticsService statisticsService = HelperFactory.getServiceHelper()
             .getStatisticsService();
+
+    private BalanceService balanceService = HelperFactory.getServiceHelper().getBalanceService();
 
     private TextView totalAmountField;
     private TextView spentToday;
@@ -163,14 +167,13 @@ public class MainActivity extends AppCompatActivity {
     private void populateMainInfo() {
         MainInfoModel mainInfoModel = calculationService.getMainInfoModel();
 
-        totalAmountField.setText(
-                CurrencyUtil.formatCurrencyByr(mainInfoModel.getTotalAmount(), true));
+        populateTotalAmount(mainInfoModel);
 
-        spentToday.setText(CurrencyUtil.formatCurrencyByr(mainInfoModel.getTodaySpending(), true));
+        spentToday.setText(CurrencyUtil.formatCurrencyByn(mainInfoModel.getTodaySpending(), true));
 
-        restForToday.setText(CurrencyUtil.formatCurrencyByr(mainInfoModel.getRestForToday(), true));
+        restForToday.setText(CurrencyUtil.formatCurrencyByn(mainInfoModel.getRestForToday(), true));
 
-        dailyAmount.setText(CurrencyUtil.formatCurrencyByr(mainInfoModel.getDailyAmount(), true));
+        dailyAmount.setText(CurrencyUtil.formatCurrencyByn(mainInfoModel.getDailyAmount(), true));
 
         Goal goal = mainInfoModel.getGoal();
         double goalAmountValue = goal.getAmount().doubleValue();
@@ -188,10 +191,21 @@ public class MainActivity extends AppCompatActivity {
         populateExchangeRate(lowestSellExchangeRate);
     }
 
+    private void populateTotalAmount(MainInfoModel mainInfoModel) {
+        Double totalAmount = mainInfoModel.getTotalAmount();
+        String text;
+        if (totalAmount != null) {
+            text = CurrencyUtil.formatCurrencyByn(totalAmount, true);
+        } else {
+            text = getString(R.string.undefined_balance);
+        }
+        totalAmountField.setText(text);
+    }
+
     private void populateExchangeRate(ExchangeRate lowestSellExchangeRate) {
         if (lowestSellExchangeRate != null) {
             Double sellingRate = lowestSellExchangeRate.getSellingRate();
-            exchangeRate.setText(CurrencyUtil.formatCurrencyByr(sellingRate, true));
+            exchangeRate.setText(CurrencyUtil.formatCurrencyByn(sellingRate, true));
         } else {
             exchangeRate.setText(getString(R.string.error_loading_rates));
         }
@@ -245,6 +259,29 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    public void updateBalance(View view) {
+        new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.dialog_balance_title))
+                .setMessage(getString(R.string.dialog_balance_message))
+                .setIcon(android.R.drawable.ic_menu_compass)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        updateBalance();
+                    }})
+                .setNegativeButton(android.R.string.no, null).show();
+    }
+
+    private void updateBalance() {
+        //noinspection unchecked
+        new BalanceUpdateTask(this, new UpdateListener<Void>() {
+            @Override
+            public void onUpdated(Void model) {
+                populateMainInfo();
+                updateTransactionList();
+            }
+        }).execute();
+    }
+
     private class MainInfoUpdateTask extends UpdateTask<Void> {
 
         private Progress dialog;
@@ -260,6 +297,39 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Void performInBackground() {
             statisticsService.updateStatistics();
+            return null;
+        }
+
+        protected void onPreExecute() {
+            dialog.show();
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
+        }
+    }
+
+    private class BalanceUpdateTask extends UpdateTask<Void> {
+
+        private UpdateListener<Void> updateListener;
+        private Progress dialog;
+
+        public BalanceUpdateTask(Activity activity, UpdateListener<Void> updateListener) {
+            this.dialog = new Progress(
+                    activity,
+                    getString(R.string.progressTitle),
+                    getString(R.string.balanceUpdating),
+                    null);
+            this.updateListener = updateListener;
+        }
+
+        @Override
+        protected Void performInBackground() {
+            balanceService.updateBalance(updateListener);
             return null;
         }
 

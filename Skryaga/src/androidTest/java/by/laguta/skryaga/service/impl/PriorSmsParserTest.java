@@ -48,6 +48,30 @@ public class PriorSmsParserTest extends TestCase {
         checkParseSms(sms, expected);
     }
 
+    public void testParseSmsSpendingEmptyBalance() throws ParseException {
+        // Given
+        String sms = "Priorbank. Karta 5***1451 19-01-2019 09:30:11. Oplata 42.27 BYN. BLR SOU INTERNETBANK.  . Spravka: 80172899292";
+        DateTime date = new DateTime(2019, 1, 19, 9, 30, 11);
+        Transaction expected = new Transaction(
+                null,
+                null, null,
+                "5***1451",
+                Currency.CurrencyType.BYR,
+                date,
+                42.27,
+                SPENDING,
+                "BLR SOU INTERNETBANK. ",
+                false,
+                true);
+        Balance balance = new Balance(null, null, date);
+        balance.setTransaction(expected);
+        expected.setBalance(balance);
+
+        // When
+        // Then
+        checkParseSms(sms, expected);
+    }
+
     public void testParseSmsCash() throws ParseException {
         // Given
         String sms = "Priorbank. Karta 5***1451 31-01-2019 09:43:44. Nalichnye v bankomate 10.00 BYN. BLR GRUSHEVKA VB1 BPSB A. Dostupno:358.58 BYN. Spravka: 80172899292";
@@ -98,20 +122,20 @@ public class PriorSmsParserTest extends TestCase {
 
     public void testParseSmsIncome() throws ParseException {
         // Given
-        String sms = "Priorbank 20/12 16:40. Na vashu kartu zachisleno 3659.41 BYN. Dostupnaja summa: 3692.29 BYN. Spravka: 80172899292";
-        DateTime date = new DateTime(2019, 12, 20, 16, 40, 00);
+        String sms = "Priorbank 20/12 16:40. Na vashu kartu zachisleno 659.41 BYN. Dostupnaja summa: 692.29 BYN. Spravka: 80172899292";
+        DateTime date = new DateTime(2019, 12, 20, 16, 40, 0);
         Transaction expected = new Transaction(
                 null,
                 null, null,
                 null,
                 Currency.CurrencyType.BYR,
                 date,
-                3659.41,
+                659.41,
                 INCOME,
                 "",
                 false,
                 true);
-        Balance balance = new Balance(null, 3692.29, date);
+        Balance balance = new Balance(null, 692.29, date);
         balance.setTransaction(expected);
         expected.setBalance(balance);
 
@@ -120,8 +144,60 @@ public class PriorSmsParserTest extends TestCase {
         checkParseSms(sms, expected);
     }
 
-    private void checkParseSms(String sms, Transaction expected) throws ParseException {
-        Transaction actual = smsParser.parseToTransaction(sms, new DateTime());
+    public void testParseSmsRefund() throws ParseException {
+        // Given
+        String sms = "Priorbank. Na kartu 5***1451 proizveden vozvrat v summe 0.06 BYN po operacii v NLD UBER. Dostupno:904.37BYN. Spravka: 80172899292";
+        DateTime date = new DateTime(2019, 2, 10, 15, 21, 11);
+        Transaction expected = new Transaction(
+                null,
+                null, null,
+                "5***1451",
+                Currency.CurrencyType.BYR,
+                date,
+                0.06,
+                INCOME,
+                "po operacii v NLD UBER.",
+                false,
+                true);
+        Balance balance = new Balance(null, 904.37, date);
+        balance.setTransaction(expected);
+        expected.setBalance(balance);
+
+        // When
+        // Then
+        checkParseSms(sms, expected, date);
+    }
+
+    public void testParseEmptyBalance() throws ParseException {
+        // Given
+        String sms = "Priorbank 21/09 11:44. Informiruem o zachislenii na vashu kartu. Spravka: 8017289929";
+        DateTime date = new DateTime(2019, 9, 21, 11, 44, 0);
+        Transaction expected = new Transaction(
+                null,
+                null, null,
+                null,
+                null,
+                date,
+                0,
+                INCOME,
+                "",
+                false,
+                true);
+        Balance balance = new Balance(null, null, date);
+        balance.setTransaction(expected);
+        expected.setBalance(balance);
+
+        // When
+        // Then
+        checkParseSms(sms, expected, date);
+    }
+
+    private void checkParseSms(String sms, Transaction expected, DateTime defaultDate) throws ParseException {
+        Transaction actual = smsParser.parseToTransaction(sms, defaultDate);
         assertEquals(expected, actual);
+    }
+
+    private void checkParseSms(String sms, Transaction expected) throws ParseException {
+        checkParseSms(sms, expected, new DateTime());
     }
 }
