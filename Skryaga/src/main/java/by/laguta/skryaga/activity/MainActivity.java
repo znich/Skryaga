@@ -1,11 +1,16 @@
 package by.laguta.skryaga.activity;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -33,6 +38,11 @@ import com.joanzapata.iconify.fonts.MaterialCommunityIcons;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import org.joda.time.DateTime;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -40,6 +50,14 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getName();
 
     private static final int SETTINGS_REQUEST_CODE = 1;
+    public static final int CALL_PHONE_REQUEST_CODE = 2;
+    public static final int RECEIVE_SMS_REQUEST_CODE = 3;
+    public static final int READ_SMS_REQUEST_CODE = 4;
+    public static final int INTERNET_REQUEST_CODE = 5;
+    public static final int READ_EXTERNAL_STORAGE_REQUEST_CODE = 6;
+    public static final int WRITE_EXTERNAL_STORAGE_REQUEST_CODE = 7;
+    public static final int READ_LOGS_REQUEST_CODE = 8;
+    public static final int BIND_ACCESSIBILITY_SERVICE_REQUEST_CODE = 9;
 
     private CalculationService calculationService = HelperFactory.getServiceHelper()
             .getCalculationService();
@@ -64,6 +82,19 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView transactionsList;
     private Drawer drawer;
 
+    private Queue<String> requestedPermissions;
+    private static final Map<String, Integer> permissionOperationMap = new HashMap<String, Integer>() {{
+        put(Manifest.permission.CALL_PHONE, CALL_PHONE_REQUEST_CODE);
+        put(Manifest.permission.RECEIVE_SMS, RECEIVE_SMS_REQUEST_CODE);
+        put(Manifest.permission.READ_SMS, READ_SMS_REQUEST_CODE);
+        put(Manifest.permission.INTERNET, INTERNET_REQUEST_CODE);
+        put(Manifest.permission.READ_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE_REQUEST_CODE);
+        put(Manifest.permission.WRITE_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE_REQUEST_CODE);
+        //put(Manifest.permission.READ_LOGS, READ_LOGS_REQUEST_CODE);
+        //put(Manifest.permission.BIND_ACCESSIBILITY_SERVICE, BIND_ACCESSIBILITY_SERVICE_REQUEST_CODE);
+    }};
+    private Integer currentPermissionRequestedCode;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.AppDefault);
@@ -77,6 +108,8 @@ public class MainActivity extends AppCompatActivity {
         initNavigationDrawer();
 
         initTransactionsList();
+
+        initLogsWriter();
     }
 
     private void bindViews() {
@@ -144,8 +177,51 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        checkPermissions();
         if (Settings.getInstance().isTransactionsProcessed()) {
             onStatisticsUpdate(null);
+        }
+    }
+
+    private void checkPermissions() {
+        requestedPermissions = new ArrayDeque<String>();
+        requestedPermissions.addAll(Arrays.asList(
+                Manifest.permission.CALL_PHONE,
+                Manifest.permission.RECEIVE_SMS,
+                Manifest.permission.READ_SMS,
+                Manifest.permission.INTERNET,
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+                //Manifest.permission.READ_LOGS,
+                //Manifest.permission.BIND_ACCESSIBILITY_SERVICE
+        ));
+        requestPermission();
+    }
+
+    private void requestPermission() {
+        String permission = requestedPermissions.poll();
+        Integer requestCode = permissionOperationMap.get(permission);
+        if (permission != null && requestCode != null) {
+            if (!checkPermissionGranted(permission)) {
+                currentPermissionRequestedCode = requestCode;
+                ActivityCompat.requestPermissions(this, new String[]{permission}, requestCode);
+            } else {
+                requestPermission();
+            }
+        } else {
+            currentPermissionRequestedCode = null;
+        }
+    }
+
+    private boolean checkPermissionGranted(String permission) {
+        return ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == currentPermissionRequestedCode) {
+            requestPermission();
         }
     }
 
@@ -158,7 +234,7 @@ public class MainActivity extends AppCompatActivity {
     private void checkFirstStart() {
         UserSettings model = Settings.getInstance().getModel();
 
-        if (model == null) {
+        if (model == null && currentPermissionRequestedCode == null) {
             PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
             showSettings(null);
         }
@@ -344,5 +420,36 @@ public class MainActivity extends AppCompatActivity {
                 dialog.dismiss();
             }
         }
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private void initLogsWriter() {
+        if (isExternalStorageWritable()) {
+
+            File appDirectory = new File( Environment.getExternalStorageDirectory() + "//" + getString(R.string.application_directory));
+            File logDirectory = new File( appDirectory + "//" + getString(R.string.log_directory));
+            File logFile = new File( logDirectory, "logcat" + new DateTime() + ".txt");
+
+            // create app folder
+            if ( !appDirectory.exists() ) {
+                appDirectory.mkdir();
+            }
+
+            if ( !logDirectory.exists() ) {
+                logDirectory.mkdir();
+            }
+            // clear the previous logcat and then write the new one to the file
+            try {
+                Process process = Runtime.getRuntime().exec("logcat -c");
+                process = Runtime.getRuntime().exec("logcat -f " + logFile + " *:I");
+            } catch ( IOException e ) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        return Environment.MEDIA_MOUNTED.equals(state);
     }
 }

@@ -41,7 +41,8 @@ public abstract class BackupPreference extends Preference {
     protected String getBackupFileDirectoryPath() {
         File file = new File(
                 Environment.getExternalStorageDirectory(),
-                "//" + getContext().getString(R.string.backupDirectory));
+                "//" + getContext().getString(R.string.application_directory)
+                        + "//" + getContext().getString(R.string.backupDirectory));
         //noinspection ResultOfMethodCallIgnored
         file.mkdir();
         return file.getPath();

@@ -65,8 +65,10 @@ public class CurrencyUtil {
         return formatCurrency(amount, currencyType, true);
     }
 
-    public static String formatCurrency(
-            double amount, Currency.CurrencyType currencyType, boolean addCurrencySymbol) {
+    public static String formatCurrency(double amount, Currency.CurrencyType currencyType, boolean addCurrencySymbol) {
+        if (currencyType == null) {
+            return formatCurrencyByn(amount, addCurrencySymbol);
+        }
         switch (currencyType) {
             case USD:
                 return formatCurrencyUsd(amount, addCurrencySymbol);

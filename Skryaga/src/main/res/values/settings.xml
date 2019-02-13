@@ -4,5 +4,7 @@
     <string name="denomination_date">01-07-2016</string>
     <string name="denomination_value">10000</string>
     <string name="backupDirectory">skryagaBackup</string>
+    <string name="application_directory">SkryagaStorage</string>
+    <string name="log_directory">log</string>
 
 </resources>
