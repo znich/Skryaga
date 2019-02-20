@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 public class UssdParserImpl extends BaseParser implements UssdParser {
 
-    private static final String BALANCE_REGEXP = ".*Dostupno:\\s+(" + DOUBLE_REGEXP + ")\\s+(\\S{3})";
+    private static final String BALANCE_REGEXP = ".*Dostupno:\\s+(" + DOUBLE_REGEXP + ")\\s+(\\S{3})\\s+";
 
     @Override
     public Double parseBalanceAmount(String message) {
