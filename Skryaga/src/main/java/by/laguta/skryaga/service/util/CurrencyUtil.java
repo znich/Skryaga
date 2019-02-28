@@ -111,7 +111,7 @@ public class CurrencyUtil {
     }
 
     public static Double parseCurrency(String currencyString) {
-        currencyString = currencyString.replaceAll("\\s", "");
+        currencyString = currencyString.replaceAll("\\s", "").replace(".", ",");
         Double result = null;
         try {
             Number parse = formatter.parse(currencyString);

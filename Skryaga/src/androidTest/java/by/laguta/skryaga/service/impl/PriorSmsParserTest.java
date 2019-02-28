@@ -144,6 +144,30 @@ public class PriorSmsParserTest extends AndroidTestCase {
         checkParseSms(sms, expected, new DateTime(2019, 2, 13, 16, 40, 0));
     }
 
+    public void testParseSmsIncomeEmptyBalance() throws ParseException {
+        // Given
+        String sms = "Priorbank 28/02 13:50. Na vashu kartu zachisleno 1111.55 BYN. Spravka: 80172899292";
+        DateTime date = new DateTime(2019, 2, 28, 13, 50, 0);
+        Transaction expected = new Transaction(
+                null,
+                null, null,
+                null,
+                Currency.CurrencyType.BYR,
+                date,
+                1111.55,
+                INCOME,
+                "Income operation",
+                false,
+                true);
+        Balance balance = new Balance(null, null, date);
+        balance.setTransaction(expected);
+        expected.setBalance(balance);
+
+        // When
+        // Then
+        checkParseSms(sms, expected, new DateTime(2019, 3, 13, 16, 40, 0));
+    }
+
     public void testParseSmsRefund() throws ParseException {
         // Given
         String sms = "Priorbank. Na kartu 5***1451 proizveden vozvrat v summe 0.06 BYN po operacii v NLD UBER. Dostupno:904.37BYN. Spravka: 80172899292";

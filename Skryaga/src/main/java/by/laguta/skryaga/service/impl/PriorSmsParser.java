@@ -46,8 +46,16 @@ public class PriorSmsParser extends BaseParser implements SmsParser {
             + "\\s+(" + OPERATION_REGEXP + ")"   // 3 - operation
             + "\\s+(" + DOUBLE_REGEXP + ")"     // 4 - amount
             + "\\s+(\\S{3})\\."                    // 5 - currency
-            + "\\s+[^:]+:"
+            + "\\s+Dost[^:]+:"
             + "\\s+(" + DOUBLE_REGEXP + ")"       // 6 - balance
+            + "";
+
+    private static final String SMS_INCOME_NO_BALANCE_REGEXP = "^Priorbank"
+            + "\\s+(" + DATE_REGEXP + ")"       // 1 - date
+            + "\\s+(" + TIME_REGEXP + ")\\."        // 2 - time
+            + "\\s+(" + OPERATION_REGEXP + ")"   // 3 - operation
+            + "\\s+(" + DOUBLE_REGEXP + ")"     // 4 - amount
+            + "\\s+(\\S{3})\\."                    // 5 - currency
             + "";
 
     private static final String SMS_REFUND_REGEXP = "^Priorbank. Na kartu"
@@ -85,7 +93,11 @@ public class PriorSmsParser extends BaseParser implements SmsParser {
         }
         matcher = Pattern.compile(SMS_INCOME_REGEXP).matcher(message);
         if (matcher.find()) {
-            return getIncomeTransaction(matcher, defaultDate);
+            return getIncomeTransaction(matcher, defaultDate, true);
+        }
+        matcher = Pattern.compile(SMS_INCOME_NO_BALANCE_REGEXP).matcher(message);
+        if (matcher.find()) {
+            return getIncomeTransaction(matcher, defaultDate, false);
         }
         matcher = Pattern.compile(SMS_REFUND_REGEXP).matcher(message);
         if (matcher.find()) {
@@ -149,9 +161,9 @@ public class PriorSmsParser extends BaseParser implements SmsParser {
         return date != null ? new DateTime(date) : defaultDate;
     }
 
-    private Transaction getIncomeTransaction(Matcher matcher, DateTime defaultDate) throws ParseException {
+    private Transaction getIncomeTransaction(Matcher matcher, DateTime defaultDate, boolean hasBalance) throws ParseException {
         DateTime dateTime = getDateTimeShort(matcher, defaultDate);
-        Balance balance = getBalance(matcher, dateTime, 6);
+        Balance balance = hasBalance ? getBalance(matcher, dateTime, 6) : new Balance(null, null, dateTime);
         Transaction transaction = new Transaction(
                 null,
                 null,
@@ -206,8 +218,7 @@ public class PriorSmsParser extends BaseParser implements SmsParser {
         return transaction;
     }
 
-    private Balance getBalance(Matcher matcher, DateTime dateTime, int group)
-            throws ParseException {
+    private Balance getBalance(Matcher matcher, DateTime dateTime, int group) throws ParseException {
         Double balanceAmount = parseDouble(matcher, group);
         return new Balance(null, balanceAmount, dateTime);
     }

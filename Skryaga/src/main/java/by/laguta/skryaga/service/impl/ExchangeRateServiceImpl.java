@@ -135,7 +135,7 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
         } else {
             for (Element element : usdBuyChildNodes) {
                 if (element.tagName().equals("strong")) {
-                    return   Double.valueOf(element.text());
+                    return Double.valueOf(element.text());
                 }
             }
         }

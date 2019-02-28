@@ -203,7 +203,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         Balance currentBalance = balanceDao.queryForId(balanceId);
         Balance prevBalance = balanceDao.getPreviousBalance(balanceId);
         return new BigDecimal(prevBalance.getAmount())
-                .add(new BigDecimal(currentBalance.getAmount()).negate());
+                .subtract(new BigDecimal(currentBalance.getAmount()));
     }
 
 }

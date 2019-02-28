@@ -40,8 +40,10 @@ public class BalanceServiceImpl implements BalanceService {
 
     private void sendUssd(String cardNumber, String smsSender) {
         // TODO: get number from property
-        String ussdCode = "*" + "212*" + cardNumber + Uri.encode("#");
-        context.startActivity(new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + ussdCode)));
+        String ussdCode = "*212*" + cardNumber + Uri.encode("#");
+        Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + ussdCode));
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
         balanceRetrievingActive = true;
     }
 
