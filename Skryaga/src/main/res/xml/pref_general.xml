@@ -4,13 +4,13 @@
             android:key="@string/salaryDate"
             android:dialogTitle="@string/selectSalaryDate"
             android:title="@string/selectSalaryDate"
-            android:defaultValue="9"/>
+            android:defaultValue="20"/>
 
     <by.laguta.skryaga.activity.preference.DatePreference
             android:key="@string/prepaidDate"
             android:dialogTitle="@string/selectPrepaidDate"
             android:title="@string/selectPrepaidDate"
-            android:defaultValue="23"/>
+            android:defaultValue="20"/>
 
     <by.laguta.skryaga.activity.preference.TransactionsUpdatePreference
             android:title="@string/updatePreference"

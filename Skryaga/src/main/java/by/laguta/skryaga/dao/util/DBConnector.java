@@ -28,7 +28,7 @@ public class DBConnector extends OrmLiteSqliteOpenHelper {
     public static final String DATABASE_NAME = "skryaga_dev.db";
 
     //с каждым увеличением версии, при нахождении в устройстве БД с предыдущей версией будет выполнен метод onUpgrade();
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     private Context context;
 
@@ -78,31 +78,20 @@ public class DBConnector extends OrmLiteSqliteOpenHelper {
     }
 
     @Override
-    public void onUpgrade(
-            SQLiteDatabase database, ConnectionSource connectionSource,
-            int oldVersion, int newVersion) {
-       /* try {
-            TableUtils.dropTable(connectionSource, Goal.class, true);
-            onCreate(database, connectionSource);
-        } catch (SQLException e) {
-            Log.e(TAG, "error upgrading db " + DATABASE_NAME + "from ver " + oldVersion);
-            throw new RuntimeException(e);
-        }*/
-        /*switch (newVersion) {
+    public void onUpgrade(SQLiteDatabase database, ConnectionSource connectionSource, int oldVersion, int newVersion) {
+        if (newVersion < oldVersion) {
+            return;
+        }
+
+        switch (newVersion) {
             case 3:
-            case 4:
-                String denominationDateString = context.getString(R.string.denomination_date);
-                DateTime denominationDate = DateTimeFormat.forPattern("dd-MM-yyyy")
-                        .parseDateTime(denominationDateString);
                 try {
-                    getSpendingStatisticsDao().updateDenomination(
-                            denominationDate,
-                            Integer.parseInt(context.getString(R.string.denomination_value)));
+                    getUserSettingsDao().executeRaw("ALTER TABLE `user_settings` ADD COLUMN cardNumber TEXT");
                 } catch (SQLException e) {
                     Log.e(TAG, "Error updating denomination", e);
 
                 }
-        }*/
+        }
     }
 
     public TransactionDao getTransactionDao() {

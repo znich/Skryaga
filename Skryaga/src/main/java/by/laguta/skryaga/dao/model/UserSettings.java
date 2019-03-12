@@ -24,6 +24,9 @@ public class UserSettings {
     @DatabaseField(canBeNull = false, columnName = "transactionsProcessed", defaultValue = "false")
     private Boolean transactionsProcessed;
 
+    @DatabaseField(canBeNull = true, columnName = "cardNumber")
+    private String cardNumber;
+
     public UserSettings() {
     }
 
@@ -71,6 +74,14 @@ public class UserSettings {
 
     public void setTransactionsProcessed(Boolean transactionsProcessed) {
         this.transactionsProcessed = transactionsProcessed;
+    }
+
+    public String getCardNumber() {
+        return cardNumber;
+    }
+
+    public void setCardNumber(String cardNumber) {
+        this.cardNumber = cardNumber;
     }
 
     @Override

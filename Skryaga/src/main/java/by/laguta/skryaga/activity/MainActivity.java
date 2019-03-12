@@ -12,7 +12,6 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -24,6 +23,7 @@ import android.widget.TextView;
 import by.laguta.skryaga.R;
 import by.laguta.skryaga.activity.adapter.TransactionsAdapter;
 import by.laguta.skryaga.activity.dialog.Progress;
+import by.laguta.skryaga.activity.dialog.UssdBalanceDialog;
 import by.laguta.skryaga.dao.model.ExchangeRate;
 import by.laguta.skryaga.dao.model.UserSettings;
 import by.laguta.skryaga.service.*;
@@ -306,8 +306,8 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            int salaryDate = sharedPreferences.getInt(getString(R.string.salaryDate), 9);
-            int prepaidDate = sharedPreferences.getInt(getString(R.string.prepaidDate), 23);
+            int salaryDate = sharedPreferences.getInt(getString(R.string.salaryDate), 20);
+            int prepaidDate = sharedPreferences.getInt(getString(R.string.prepaidDate), 20);
             UserSettings userSettings = new UserSettings(null, salaryDate, prepaidDate, true);
 
             Settings settings = Settings.getInstance();
@@ -336,15 +336,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateBalance(View view) {
-        new AlertDialog.Builder(this)
-                .setTitle(getString(R.string.dialog_balance_title))
-                .setMessage(getString(R.string.dialog_balance_message))
-                .setIcon(android.R.drawable.ic_menu_compass)
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        updateBalance();
-                    }})
-                .setNegativeButton(android.R.string.no, null).show();
+       new UssdBalanceDialog(this, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                updateBalance();
+            }}).show();
     }
 
     private void updateBalance() {

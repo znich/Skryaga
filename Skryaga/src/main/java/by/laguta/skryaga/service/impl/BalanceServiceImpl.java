@@ -12,10 +12,12 @@ import by.laguta.skryaga.dao.TransactionDao;
 import by.laguta.skryaga.dao.model.Balance;
 import by.laguta.skryaga.dao.model.BankAccount;
 import by.laguta.skryaga.dao.model.Transaction;
+import by.laguta.skryaga.dao.model.UserSettings;
 import by.laguta.skryaga.service.BalanceService;
 import by.laguta.skryaga.service.UpdateListener;
 import by.laguta.skryaga.service.UssdParser;
 import by.laguta.skryaga.service.util.HelperFactory;
+import by.laguta.skryaga.service.util.Settings;
 
 import java.sql.SQLException;
 
@@ -54,7 +56,8 @@ public class BalanceServiceImpl implements BalanceService {
             if (currentBalance != null) {
                 Transaction transaction = transactionDao.queryForId(currentBalance.getTransaction().getId());
                 BankAccount bankAccount = bankAccountDao.queryForId(transaction.getBankAccount().getId());
-                String defaultCard = bankAccount.getDefaultCard();
+                UserSettings model = Settings.getInstance().getModel();
+                String defaultCard = model.getCardNumber();
 
                 if (defaultCard != null) {
                     addReceiver(updateListener);

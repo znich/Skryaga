@@ -11,8 +11,7 @@ import android.content.Context;
  */
 public class Progress extends ProgressDialog {
 
-    public Progress(
-            Context context, String title, CharSequence message, OnDismissListener listener) {
+    public Progress(Context context, String title, CharSequence message, OnDismissListener listener) {
         super(context);
 
         setTitle(title);
