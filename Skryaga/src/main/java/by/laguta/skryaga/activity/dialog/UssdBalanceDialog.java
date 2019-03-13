@@ -5,8 +5,9 @@ import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import by.laguta.skryaga.R;
 import by.laguta.skryaga.dao.model.UserSettings;
 import by.laguta.skryaga.service.util.Settings;
@@ -14,10 +15,11 @@ import by.laguta.skryaga.service.util.Settings;
 public class UssdBalanceDialog extends AlertDialog {
 
     private static final int OK_BUTTON = -1;
-    public static final int NO_BUTTON = -2;
+    private static final int NO_BUTTON = -2;
     private EditText input;
 
     private boolean initialButtonState = false;
+    private final View layout;
 
     public UssdBalanceDialog(Context context, final OnClickListener listener) {
         super(context);
@@ -26,8 +28,10 @@ public class UssdBalanceDialog extends AlertDialog {
         setMessage(context.getString(R.string.dialog_balance_message));
         setIcon(android.R.drawable.ic_menu_compass);
 
-
         addShowListener();
+
+        layout = LayoutInflater.from(context).inflate(R.layout.ussd_dialog, null);
+        setView(layout);
 
         initCardNumberInput(context);
 
@@ -54,7 +58,7 @@ public class UssdBalanceDialog extends AlertDialog {
     }
 
     private void initCardNumberInput(Context context) {
-        input = new EditText(context);
+        input = (EditText) layout.findViewById(R.id.dialog_balance_input);
 
         UserSettings model = Settings.getInstance().getModel();
         if (model != null) {
@@ -68,9 +72,6 @@ public class UssdBalanceDialog extends AlertDialog {
         }
 
         input.addTextChangedListener(new CardNumberTextWatcher());
-        input.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-        setView(input);
     }
 
     private void addShowListener() {

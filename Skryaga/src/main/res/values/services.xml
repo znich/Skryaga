@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="ecopress_url">http://www.ecopress.by/ru/page/65.html</string>
-    <string name="Priorbank_bank_card">1451</string>
     <string-array name="bank_accounts">
         <item>Priorbank</item>
     </string-array>
