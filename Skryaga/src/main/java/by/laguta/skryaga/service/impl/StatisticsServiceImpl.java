@@ -180,21 +180,12 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     private BigDecimal getTransactionAmount(Transaction transaction) throws SQLException {
-        String denominationDateString = context.getString(R.string.denomination_date);
-        DateTime denominationDate = DateTimeFormat.forPattern("dd-MM-yyyy")
-                .parseDateTime(denominationDateString);
-        int denominationValue = Integer.parseInt(context.getString(R.string.denomination_value));
-
         Double transactionAmount = transaction.getAmount() != null ? transaction.getAmount() : 0;
         BigDecimal amount = transaction.isByrCurrency()
                 ? new BigDecimal(transactionAmount)
                 : getAmountForForeignCurrency(transaction);
 
-        DateTime transactionDate = transaction.getDate().withTimeAtStartOfDay();
-        if (transactionDate.isBefore(denominationDate)) {
-            amount = amount.divide(
-                    new BigDecimal(denominationValue), 4, BigDecimal.ROUND_HALF_DOWN);
-        }
+        amount = correctDenomination(amount, transaction.getDate());
         return amount;
     }
 
@@ -202,8 +193,23 @@ public class StatisticsServiceImpl implements StatisticsService {
         Long balanceId = transaction.getBalance().getId();
         Balance currentBalance = balanceDao.queryForId(balanceId);
         Balance prevBalance = balanceDao.getPreviousBalance(balanceId);
-        return new BigDecimal(prevBalance.getAmount())
-                .subtract(new BigDecimal(currentBalance.getAmount()));
+        if (prevBalance.getAmount() != null && currentBalance.getAmount() != null) {
+            return new BigDecimal(prevBalance.getAmount()).subtract(new BigDecimal(currentBalance.getAmount()));
+        }
+        return BigDecimal.ZERO;
+    }
+
+    private BigDecimal correctDenomination(BigDecimal amount, DateTime date) {
+        String denominationDateString = context.getString(R.string.denomination_date);
+        DateTime denominationDate = DateTimeFormat.forPattern("dd-MM-yyyy")
+                .parseDateTime(denominationDateString);
+        int denominationValue = Integer.parseInt(context.getString(R.string.denomination_value));
+        DateTime transactionDate = date.withTimeAtStartOfDay();
+        if (transactionDate.isBefore(denominationDate)) {
+            amount = amount.divide(
+                    new BigDecimal(denominationValue), 4, BigDecimal.ROUND_HALF_DOWN);
+        }
+        return amount;
     }
 
 }
