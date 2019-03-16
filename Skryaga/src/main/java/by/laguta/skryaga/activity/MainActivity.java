@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateTransactionList() {
         TransactionsAdapter transactionsAdapter = new TransactionsAdapter(
-                calculationService.getAllTransactions(), this);
+                calculationService.getGroupedTransactions(), this);
         transactionsList.setAdapter(transactionsAdapter);
     }
 

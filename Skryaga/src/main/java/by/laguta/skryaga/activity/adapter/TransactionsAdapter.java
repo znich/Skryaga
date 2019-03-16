@@ -8,6 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import by.laguta.skryaga.R;
+import by.laguta.skryaga.activity.adapter.view.DateItem;
+import by.laguta.skryaga.activity.adapter.view.TransactionItem;
+import by.laguta.skryaga.activity.adapter.view.ListItem;
 import by.laguta.skryaga.activity.dialog.GoalDialog;
 import by.laguta.skryaga.dao.GoalTransactionDao;
 import by.laguta.skryaga.dao.TransactionDao;
@@ -19,11 +22,14 @@ import by.laguta.skryaga.service.util.ConvertUtil;
 import by.laguta.skryaga.service.util.CurrencyUtil;
 import by.laguta.skryaga.service.util.HelperFactory;
 import com.joanzapata.iconify.widget.IconTextView;
+import org.joda.time.DateTime;
 import org.joda.time.format.*;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Author : Anatoly
@@ -32,62 +38,129 @@ import java.util.List;
  * @author Anatoly
  */
 public class TransactionsAdapter
-        extends RecyclerView.Adapter<TransactionsAdapter.TransactionListItemHolder>
+        extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         implements TransactionsUpdateListener {
 
-    private List<TransactionUIModel> transactions;
+
+    public static final String DATE_FORMAT = "dd MMMM yy";
+    private List<ListItem> consolidatedList;
 
     private Context context;
 
-    public TransactionsAdapter(List<TransactionUIModel> transactions, Context context) {
-        this.transactions = transactions;
+    public TransactionsAdapter(Map<DateTime, List<TransactionUIModel>> transactions, Context context) {
         this.context = context;
+        populateConsolidatedList(transactions);
+    }
+
+    private void populateConsolidatedList(Map<DateTime, List<TransactionUIModel>> transactions) {
+        consolidatedList = new ArrayList<>();
+        for (DateTime dateTime : transactions.keySet()) {
+            DateItem dateItem = new DateItem(formatDate(dateTime));
+            consolidatedList.add(dateItem);
+
+            for (TransactionUIModel transactionUIModel : transactions.get(dateTime)) {
+                TransactionItem transactionItem = new TransactionItem(transactionUIModel);
+                consolidatedList.add(transactionItem);
+            }
+        }
+    }
+
+    private String formatDate(DateTime dateTime) {
+        return dateTime.toString(createDateFormatter(DATE_FORMAT));
     }
 
     @Override
-    public TransactionListItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.transaction, parent, false);
 
-        return new TransactionListItemHolder(v, this);
+        //return new TransactionListItemHolder(v, this);
+
+
+        RecyclerView.ViewHolder viewHolder = null;
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+
+        switch (viewType) {
+
+            case ListItem.TYPE_TRANSACTION:
+                View v1 = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.transaction, parent, false);
+                viewHolder = new TransactionListItemHolder(v1, this);
+                break;
+
+            case ListItem.TYPE_DATE:
+                View v2 = inflater.inflate(R.layout.date_list_item, parent, false);
+                viewHolder = new DateViewHolder(v2);
+                break;
+        }
+
+        return viewHolder;
     }
 
     @Override
-    public void onBindViewHolder(TransactionListItemHolder holder, int position) {
-        holder.populate(transactions.get(position), context);
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+
+        switch (holder.getItemViewType()) {
+
+            case ListItem.TYPE_TRANSACTION:
+                TransactionItem transactionItem = (TransactionItem) consolidatedList.get(position);
+                TransactionListItemHolder transactionListItemHolder = (TransactionListItemHolder) holder;
+                transactionListItemHolder.populate(transactionItem.getModel(), context);
+                break;
+            case ListItem.TYPE_DATE:
+                DateItem dateItem = (DateItem) consolidatedList.get(position);
+                DateViewHolder dateViewHolder = (DateViewHolder) holder;
+                dateViewHolder.populate(dateItem.getDate());
+                break;
+        }
     }
 
     @Override
     public int getItemCount() {
-        return transactions.size();
+        return consolidatedList != null ? consolidatedList.size() : 0;
     }
 
     @Override
     public void onTransactionsUpdated(TransactionUIModel transaction) {
         int index = findTransactionIndex(transaction.getId());
         if (index > 0) {
-            transactions.get(index).populateWith(transaction);
+            ((TransactionItem) consolidatedList.get(index)).getModel().populateWith(transaction);
             notifyItemChanged(index);
         }
     }
 
     private int findTransactionIndex(Long id) {
-        for (int i = 0; i < transactions.size(); i++) {
-            if (transactions.get(i).getId().equals(id)) {
-                return i;
+        for (int i = 0; i < consolidatedList.size(); i++) {
+            ListItem listItem = consolidatedList.get(i);
+            if (listItem.getType() == ListItem.TYPE_TRANSACTION) {
+                if (((TransactionItem) listItem).getModel().getId().equals(id)) {
+                    return i;
+                }
             }
         }
         return -1;
     }
 
     @Override
-    public void onTransactionAdded(
-            TransactionUIModel transaction, TransactionUIModel parentTransaction) {
+    public void onTransactionAdded(TransactionUIModel transaction, TransactionUIModel parentTransaction) {
         int index = findTransactionIndex(parentTransaction.getId());
-        transactions.add(++index, transaction);
+        consolidatedList.add(++index, new TransactionItem(transaction));
         notifyItemInserted(index);
     }
+
+    @Override
+    public int getItemViewType(int position) {
+        return consolidatedList.get(position).getType();
+    }
+
+    private static DateTimeFormatter createDateFormatter(String dateFormat) {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern(dateFormat);
+        DateTimeParser parser = dateTimeFormatter.getParser();
+        DateTimePrinter printer = dateTimeFormatter.getPrinter();
+        return new DateTimeFormatterBuilder().append(printer, parser).toFormatter();
+    }
+
 
     public static class TransactionListItemHolder extends RecyclerView.ViewHolder {
 
@@ -108,7 +181,7 @@ public class TransactionsAdapter
             this.transactionsUpdateListener = transactionsUpdateListener;
         }
 
-        public void populate(final TransactionUIModel transaction, Context context) {
+        public void populate(TransactionUIModel transaction, Context context) {
             this.context = context;
             initializeDate(transaction);
 
@@ -121,11 +194,7 @@ public class TransactionsAdapter
 
         private void initializeDate(TransactionUIModel transaction) {
             TextView date = (TextView) itemView.findViewById(R.id.transactionDate);
-            DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern(DATE_FORMAT);
-            DateTimeParser parser = dateTimeFormatter.getParser();
-            DateTimePrinter printer = dateTimeFormatter.getPrinter();
-            DateTimeFormatter formatter = new DateTimeFormatterBuilder()
-                    .append(printer, parser).toFormatter();
+            DateTimeFormatter formatter = createDateFormatter(DATE_FORMAT);
             date.setText(transaction.getMessageDate().toString(formatter));
         }
 
@@ -231,6 +300,18 @@ public class TransactionsAdapter
             } catch (SQLException e) {
                 Log.e(TAG, "Error splitting transaction", e);
             }
+        }
+    }
+
+    public static class DateViewHolder extends RecyclerView.ViewHolder {
+
+        public DateViewHolder(View itemView) {
+            super(itemView);
+        }
+
+        public void populate(String date) {
+            TextView dateView = (TextView) itemView.findViewById(R.id.groupTransactionDate);
+            dateView.setText(date);
         }
     }
 

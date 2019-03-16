@@ -5,6 +5,7 @@ import by.laguta.skryaga.dao.BalanceDao;
 import by.laguta.skryaga.dao.SpendingStatisticsDao;
 import by.laguta.skryaga.dao.TransactionDao;
 import by.laguta.skryaga.dao.model.*;
+import by.laguta.skryaga.dao.model.Currency;
 import by.laguta.skryaga.service.CalculationService;
 import by.laguta.skryaga.service.ExchangeRateService;
 import by.laguta.skryaga.service.model.Goal;
@@ -19,8 +20,7 @@ import org.joda.time.Interval;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Revision Info : $Author$ $Date$
@@ -147,6 +147,25 @@ public class CalculationServiceImpl implements CalculationService {
             Log.e(TAG, "Error getting transactions", e);
         }
         return ConvertUtil.convertToUIModels(transactions);
+    }
+
+    @Override
+    public Map<DateTime, List<TransactionUIModel>> getGroupedTransactions() {
+        Map<DateTime, List<TransactionUIModel>> dateTimeListHashMap = new LinkedHashMap<>();
+
+        List<TransactionUIModel> allTransactions = getAllTransactions();
+
+        for (TransactionUIModel transactionUIModel : allTransactions) {
+            DateTime date = transactionUIModel.getTransactionDate().withTimeAtStartOfDay();
+            List<TransactionUIModel> transactionUIModels = dateTimeListHashMap.get(date);
+            if (transactionUIModels == null) {
+                transactionUIModels = new ArrayList<>();
+                dateTimeListHashMap.put(date, transactionUIModels);
+            }
+            transactionUIModels.add(transactionUIModel);
+        }
+
+        return dateTimeListHashMap;
     }
 
     private long getDaysBeforePrepaid() {

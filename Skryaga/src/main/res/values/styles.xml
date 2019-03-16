@@ -17,8 +17,6 @@
         <item name="android:textColor">@color/white</item>
         <item name="android:textSize">24sp</item>
     </style>
-    Error:Gradle: Execution failed for task ':Skryaga:processDebugManifest'.
-    > Error: [D:\Programms\Java\workspace\Skryaga\Skryaga\build\intermediates\exploded-aar\com.android.support\appcompat-v7\23.2.1\AndroidManifest.xml:21] Invalid instruction 'overrideLibrary', valid instructions are : REMOVE,REPLACE,STRICT
     <style name="mainInfo" parent="AppTheme">
         <item name="android:layout_height">130dp</item>
         <item name="android:paddingLeft">10dp</item>
@@ -48,7 +46,7 @@
 
     <!-- TRANSACTIONS -->
     <style name="transactionsList">
-
+        <item name="android:paddingTop">2dp</item>
     </style>
 
     <style name="transactionItem">
@@ -57,26 +55,42 @@
         <item name="android:layout_marginBottom">2dp</item>
         <item name="android:layout_marginTop">2dp</item>
     </style>
+
     <style name="transactionText">
         <item name="android:textColor">@color/teraLight</item>
         <item name="android:textSize">16sp</item>
         <item name="android:layout_centerVertical">true</item>
     </style>
+
     <style name="transactionItemDate" parent="transactionText">
         <item name="android:width">150dp</item>
         <item name="android:paddingRight">10dp</item>
     </style>
+
+    <style name="transactionGroupDate" parent="transactionText">
+        <item name="android:background">@drawable/date_item_background</item>
+        <item name="android:paddingRight">2dp</item>
+        <item name="android:paddingLeft">2dp</item>
+        <item name="android:paddingTop">0dp</item>
+        <item name="android:paddingBottom">0dp</item>
+        <item name="android:layout_marginRight">5dp</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+
     <style name="transactionAmount" parent="transactionText">
         <item name="android:paddingLeft">5dp</item>
     </style>
+
     <style name="transactionMessage" parent="transactionText">
         <item name="android:textSize">12sp</item>
         <item name="android:layout_marginTop">10dp</item>
         <item name="android:alpha">0.87</item>
     </style>
+
     <style name="transactionIcon" parent="transactionText">
         <item name="android:layout_marginTop">-2dp</item>
     </style>
+
     <style name="transactionGoalIcon" parent="transactionText">
         <item name="android:textSize">25sp</item>
     </style>
@@ -85,6 +99,7 @@
     <style name="goalDialog">
         <item name="android:paddingLeft">23dp</item>
     </style>
+
     <style name="dialogLabel">
         <item name="android:textSize">16sp</item>
     </style>
