@@ -12,6 +12,11 @@
             android:title="@string/selectPrepaidDate"
             android:defaultValue="20"/>
 
+    <by.laguta.skryaga.activity.preference.SecureModePreference
+            android:key="@string/secureMode"
+            android:title="@string/secureModePreference"
+            android:defaultValue="false"/>
+
     <by.laguta.skryaga.activity.preference.TransactionsUpdatePreference
             android:title="@string/updatePreference"
             android:key="@string/transactionsProcessed"

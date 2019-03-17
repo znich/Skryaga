@@ -18,15 +18,28 @@
                     android:text="@string/amountLabel"
                     android:id="@+id/total_amount_label"
                     android:textIsSelectable="false"
-                    style="@style/mainInfoTextLabel"/>
-            <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=""
-                    android:id="@+id/total_amount_field"
-                    android:layout_gravity="center"
-                    style="@style/mainInfoText"
+                    style="@style/mainInfoTextLabel"
                     android:onClick="updateBalance"/>
+
+            <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/total_amount_warpper"
+                    android:layout_marginTop="10dp">
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:id="@+id/total_amount_field"
+                        android:layout_gravity="center"
+                        style="@style/mainInfoText"
+                        android:paddingTop="5dp"
+                        android:paddingBottom="5dp"
+                        android:lines="1"
+                        android:layout_marginBottom="0dp"
+                        android:layout_marginTop="0dp"
+                />
+            </RelativeLayout>
         </LinearLayout>
         <LinearLayout
                 android:layout_width="match_parent"

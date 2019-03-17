@@ -27,6 +27,9 @@ public class UserSettings {
     @DatabaseField(canBeNull = true, columnName = "cardNumber")
     private String cardNumber;
 
+    @DatabaseField(canBeNull = true, columnName = "secureModeEnabled", defaultValue = "false")
+    private Boolean secureModeEnabled;
+
     public UserSettings() {
     }
 
@@ -37,10 +40,11 @@ public class UserSettings {
     }
 
     public UserSettings(
-            Long id, Integer salaryDate, Integer prepaidDate, Boolean transactionsProcessed) {
+            Long id, Integer salaryDate, Integer prepaidDate, boolean secureModeEnabled, boolean transactionsProcessed) {
         this.id = id;
         this.salaryDate = salaryDate;
         this.prepaidDate = prepaidDate;
+        this.secureModeEnabled = secureModeEnabled;
         this.transactionsProcessed = transactionsProcessed;
     }
 
@@ -84,6 +88,18 @@ public class UserSettings {
         this.cardNumber = cardNumber;
     }
 
+    public Boolean getSecureModeEnabled() {
+        return secureModeEnabled;
+    }
+
+    public void setSecureModeEnabled(Boolean secureModeEnabled) {
+        this.secureModeEnabled = secureModeEnabled;
+    }
+
+    public boolean isSecureModeEnabled() {
+        return secureModeEnabled != null && secureModeEnabled;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -91,17 +107,32 @@ public class UserSettings {
 
         UserSettings that = (UserSettings) o;
 
-        if (id != null ? !id.equals(that.id) : that.id != null) return false;
-        if (prepaidDate != null ? !prepaidDate.equals(that.prepaidDate) : that.prepaidDate != null)
+        if (id != null ? !id.equals(that.id) : that.id != null) {
             return false;
-        if (salaryDate != null ? !salaryDate.equals(that.salaryDate) : that.salaryDate != null)
+        }
+        if (prepaidDate != null ? !prepaidDate.equals(that.prepaidDate) : that.prepaidDate != null) {
             return false;
+        }
+        if (salaryDate != null ? !salaryDate.equals(that.salaryDate) : that.salaryDate != null) {
+            return false;
+        }
+
+        if (cardNumber != null ? !cardNumber.equals(that.cardNumber) : that.cardNumber != null) {
+            return false;
+        }
+
+        if (secureModeEnabled != null ? !secureModeEnabled.equals(that.secureModeEnabled) : that.secureModeEnabled != null) {
+            return false;
+        }
 
         //noinspection RedundantIfStatement
         if (transactionsProcessed != null
                 ? !transactionsProcessed.equals(that.transactionsProcessed)
-                : that.transactionsProcessed != null)
+                : that.transactionsProcessed != null) {
             return false;
+        }
+
+
 
         return true;
     }
@@ -111,8 +142,7 @@ public class UserSettings {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (salaryDate != null ? salaryDate.hashCode() : 0);
         result = 31 * result + (prepaidDate != null ? prepaidDate.hashCode() : 0);
-        result = 31 * result
-                + (transactionsProcessed != null ? transactionsProcessed.hashCode() : 0);
+        result = 31 * result + (transactionsProcessed != null ? transactionsProcessed.hashCode() : 0);
         return result;
     }
 }

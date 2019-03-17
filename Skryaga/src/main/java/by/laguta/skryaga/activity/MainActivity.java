@@ -16,14 +16,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
+import android.view.*;
 import android.widget.TextView;
 import by.laguta.skryaga.R;
 import by.laguta.skryaga.activity.adapter.TransactionsAdapter;
 import by.laguta.skryaga.activity.dialog.Progress;
 import by.laguta.skryaga.activity.dialog.UssdBalanceDialog;
+import by.laguta.skryaga.activity.listeners.SwipeListener;
 import by.laguta.skryaga.dao.model.ExchangeRate;
 import by.laguta.skryaga.dao.model.UserSettings;
 import by.laguta.skryaga.service.*;
@@ -94,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
         //put(Manifest.permission.BIND_ACCESSIBILITY_SERVICE, BIND_ACCESSIBILITY_SERVICE_REQUEST_CODE);
     }};
     private Integer currentPermissionRequestedCode;
+    private SwipeListener totalAmountSwipeListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,6 +122,8 @@ public class MainActivity extends AppCompatActivity {
         goalAmount = (TextView) findViewById(R.id.goal_amount_field);
         exchangeRate = (TextView) findViewById(R.id.exchange_amount_field);
 
+        totalAmountSwipeListener = new SwipeListener(totalAmountField, this);
+        totalAmountField.setOnTouchListener(totalAmountSwipeListener);
         refreshLayout = (SwipeRefreshLayout) findViewById(R.id.transactionsRefresh);
         transactionsList = (RecyclerView) findViewById(R.id.transactions_view);
     }
@@ -251,11 +253,7 @@ public class MainActivity extends AppCompatActivity {
 
         dailyAmount.setText(CurrencyUtil.formatCurrencyByn(mainInfoModel.getDailyAmount(), true));
 
-        Goal goal = mainInfoModel.getGoal();
-        double goalAmountValue = goal.getAmount().doubleValue();
-        String goalText = CurrencyUtil.formatCurrency(goalAmountValue, goal.getCurrencyType());
-
-        goalAmount.setText(goalText);
+        populateGoal(mainInfoModel);
 
         ExchangeRate lowestSellExchangeRate = exchangeRateService.getLowestExchangeRate(
                 new UpdateExchangeRateListener() {
@@ -276,6 +274,16 @@ public class MainActivity extends AppCompatActivity {
             text = getText(R.string.undefined_balance);
         }
         totalAmountField.setText(text);
+        totalAmountSwipeListener.initializePosition(totalAmount);
+    }
+
+    private void populateGoal(MainInfoModel mainInfoModel) {
+        Goal goal = mainInfoModel.getGoal();
+        double goalAmountValue = goal.getAmount().doubleValue();
+        String goalText = CurrencyUtil.formatCurrency(goalAmountValue, goal.getCurrencyType());
+
+        goalAmount.setText(goalText);
+        // TODO: 17.03.2019 mask goal
     }
 
     private void populateExchangeRate(ExchangeRate lowestSellExchangeRate) {
@@ -297,18 +305,18 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == SETTINGS_REQUEST_CODE) {
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(
-                    this);
-            boolean transactionPrecessed = sharedPreferences.getBoolean(
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+            boolean transactionProcessed = sharedPreferences.getBoolean(
                     getString(R.string.transactionsProcessed), false);
 
-            if (!transactionPrecessed) {
+            if (!transactionProcessed) {
                 return;
             }
 
             int salaryDate = sharedPreferences.getInt(getString(R.string.salaryDate), 20);
             int prepaidDate = sharedPreferences.getInt(getString(R.string.prepaidDate), 20);
-            UserSettings userSettings = new UserSettings(null, salaryDate, prepaidDate, true);
+            boolean secureModeEnabled = sharedPreferences.getBoolean(getString(R.string.secureMode), false);
+            UserSettings userSettings = new UserSettings(null, salaryDate, prepaidDate, secureModeEnabled, true);
 
             Settings settings = Settings.getInstance();
             UserSettings currentModel = settings.getModel();

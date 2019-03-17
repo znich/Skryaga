@@ -17,6 +17,9 @@
     <string name="cancel">Cancel</string>
     <string name="selectSalaryDate">Select salary date</string>
     <string name="selectPrepaidDate">Select prepaid date</string>
+    <string name="secureModePreference">Secure mode</string>
+    <string name="secureModePreferenceEnabled">Amount, goal and all income transaction values are partially hided</string>
+    <string name="secureModePreferenceDisabled">Enable secure mode to partially hide your current amount and other secure data</string>
     <string name="updated">Updated</string>
     <string name="needUpdated">You must update existing transactions to start use the application!</string>
     <string name="parsing">Parsing transactions</string>
