@@ -46,6 +46,9 @@ public class Settings {
         try {
             if (model != null) {
                 userSettings.setId(model.getId());
+                if (userSettings.getCardNumber() == null && model.getCardNumber() != null) {
+                    userSettings.setCardNumber(model.getCardNumber());
+                }
             }
             userSettingsDao.createOrUpdate(userSettings);
             model = userSettings;
