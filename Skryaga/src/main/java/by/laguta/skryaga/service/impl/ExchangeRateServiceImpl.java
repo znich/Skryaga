@@ -216,8 +216,10 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
             }
             try {
                 ExchangeRate lowestRate = getLowestRate();
-                saveOrUpdateLowestExchangeRate(lowestRate);
-                lastUpdated = new DateTime();
+                if (lowestRate != null) {
+                    saveOrUpdateLowestExchangeRate(lowestRate);
+                    lastUpdated = new DateTime();
+                }
                 return lowestRate;
             } catch (ExchangeRateUpdateException e) {
                 return null;
@@ -226,7 +228,7 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
 
         private ExchangeRate getLowestRate() throws ExchangeRateUpdateException {
             Set<ExchangeRate> exchangeRates = getExchangeRates();
-            return Collections.min(exchangeRates);
+            return exchangeRates.isEmpty() ? null : Collections.min(exchangeRates);
         }
 
     }
