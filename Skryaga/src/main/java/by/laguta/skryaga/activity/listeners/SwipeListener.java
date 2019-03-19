@@ -18,11 +18,14 @@ public class SwipeListener implements View.OnTouchListener {
     private Timer timer;
     private TimerTask task;
     private Activity activity;
-    private Double totalAmount;
+    private TotalAmountProvider totalAmountProvider;
+    private boolean wideField;
 
-    public SwipeListener(View swipableView, Activity activity) {
+    public SwipeListener(View swipableView, Activity activity, TotalAmountProvider totalAmountProvider, boolean wideField) {
         this.swipableView = swipableView;
         this.activity = activity;
+        this.totalAmountProvider = totalAmountProvider;
+        this.wideField = wideField;
         timer = new Timer();
     }
 
@@ -86,23 +89,30 @@ public class SwipeListener implements View.OnTouchListener {
         moveToLeft(leftMargin);
     }
 
-    public void initializePosition(Double totalAmount) {
-        this.totalAmount = totalAmount;
+    public void updatePosition() {
         setPosition();
     }
 
     private void setPosition() {
-        if (shouldHide(totalAmount)) {
-            int swipeMargin = totalAmount > 9999 ? -48 : -32;
+        if (shouldHide()) {
+            int swipeMargin = getTotalAmount() > 9999 && wideField ? -48 : -32;
             moveLeftWithAnimation(swipeMargin);
         } else {
             moveLeftWithAnimation(0);
         }
     }
 
-    private boolean shouldHide(Double totalAmount) {
+    private Double getTotalAmount() {
+        return totalAmountProvider.getTotalAmount();
+    }
+
+    private boolean shouldHide() {
         Settings settings = Settings.getInstance();
         boolean secureModeEnabled = settings.getModel().isSecureModeEnabled();
-        return secureModeEnabled && totalAmount != null && totalAmount > 1000;
+        return secureModeEnabled && getTotalAmount() != null && getTotalAmount() > 1000;
+    }
+
+    public interface TotalAmountProvider {
+        Double getTotalAmount();
     }
 }

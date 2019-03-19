@@ -23,21 +23,13 @@
 
             <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/total_amount_warpper"
-                    android:layout_marginTop="10dp">
+                    android:layout_height="wrap_content">
                 <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=""
                         android:id="@+id/total_amount_field"
-                        android:layout_gravity="center"
-                        style="@style/mainInfoText"
-                        android:paddingTop="5dp"
-                        android:paddingBottom="5dp"
-                        android:lines="1"
-                        android:layout_marginBottom="0dp"
-                        android:layout_marginTop="0dp"
+                        style="@style/swipableAmount"
                 />
             </RelativeLayout>
         </LinearLayout>
@@ -86,12 +78,19 @@
                     android:text="@string/goalLabel"
                     android:id="@+id/goal_amount_label"
                     style="@style/mainInfoRightText"/>
-            <TextView
-                    android:layout_width="wrap_content"
+
+            <RelativeLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text=""
-                    android:id="@+id/goal_amount_field"
-                    style="@style/mainInfoText"/>
+                    android:layout_marginTop="0dp">
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:id="@+id/goal_amount_field"
+                        style="@style/swipableAmount"
+                />
+            </RelativeLayout>
         </LinearLayout>
     </TableRow>
     <TableRow android:layout_width="match_parent" android:layout_height="wrap_content">

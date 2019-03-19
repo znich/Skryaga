@@ -23,6 +23,7 @@ import by.laguta.skryaga.activity.adapter.TransactionsAdapter;
 import by.laguta.skryaga.activity.dialog.Progress;
 import by.laguta.skryaga.activity.dialog.UssdBalanceDialog;
 import by.laguta.skryaga.activity.listeners.SwipeListener;
+import by.laguta.skryaga.dao.model.Currency;
 import by.laguta.skryaga.dao.model.ExchangeRate;
 import by.laguta.skryaga.dao.model.UserSettings;
 import by.laguta.skryaga.service.*;
@@ -41,10 +42,11 @@ import org.joda.time.DateTime;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.*;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SwipeListener.TotalAmountProvider {
 
     private static final String TAG = MainActivity.class.getName();
 
@@ -94,6 +96,8 @@ public class MainActivity extends AppCompatActivity {
     }};
     private Integer currentPermissionRequestedCode;
     private SwipeListener totalAmountSwipeListener;
+    private SwipeListener goalAmountSwipeListener;
+    private MainInfoModel mainInfoModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,8 +126,10 @@ public class MainActivity extends AppCompatActivity {
         goalAmount = (TextView) findViewById(R.id.goal_amount_field);
         exchangeRate = (TextView) findViewById(R.id.exchange_amount_field);
 
-        totalAmountSwipeListener = new SwipeListener(totalAmountField, this);
+        totalAmountSwipeListener = new SwipeListener(totalAmountField, this, this, true);
         totalAmountField.setOnTouchListener(totalAmountSwipeListener);
+        goalAmountSwipeListener = new SwipeListener(goalAmount, this, this, false);
+        goalAmount.setOnTouchListener(goalAmountSwipeListener);
         refreshLayout = (SwipeRefreshLayout) findViewById(R.id.transactionsRefresh);
         transactionsList = (RecyclerView) findViewById(R.id.transactions_view);
     }
@@ -243,8 +249,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void populateMainInfo() {
-        MainInfoModel mainInfoModel = calculationService.getMainInfoModel();
-
+        mainInfoModel = calculationService.getMainInfoModel();
+        mainInfoModel.setTotalAmount(15698.13d);
+        mainInfoModel.setGoal(new Goal(new BigDecimal(523), Currency.CurrencyType.USD));
         populateTotalAmount(mainInfoModel);
 
         spentToday.setText(CurrencyUtil.formatCurrencyByn(mainInfoModel.getTodaySpending(), true));
@@ -274,7 +281,7 @@ public class MainActivity extends AppCompatActivity {
             text = getText(R.string.undefined_balance);
         }
         totalAmountField.setText(text);
-        totalAmountSwipeListener.initializePosition(totalAmount);
+        totalAmountSwipeListener.updatePosition();
     }
 
     private void populateGoal(MainInfoModel mainInfoModel) {
@@ -283,7 +290,7 @@ public class MainActivity extends AppCompatActivity {
         String goalText = CurrencyUtil.formatCurrency(goalAmountValue, goal.getCurrencyType());
 
         goalAmount.setText(goalText);
-        // TODO: 17.03.2019 mask goal
+        goalAmountSwipeListener.updatePosition();
     }
 
     private void populateExchangeRate(ExchangeRate lowestSellExchangeRate) {
@@ -359,6 +366,11 @@ public class MainActivity extends AppCompatActivity {
                 updateTransactionList();
             }
         }).execute();
+    }
+
+    @Override
+    public Double getTotalAmount() {
+        return mainInfoModel != null ? mainInfoModel.getTotalAmount() : null;
     }
 
     private class MainInfoUpdateTask extends UpdateTask<Void> {
