@@ -21,6 +21,7 @@ import by.laguta.skryaga.service.model.TransactionUIModel;
 import by.laguta.skryaga.service.util.ConvertUtil;
 import by.laguta.skryaga.service.util.CurrencyUtil;
 import by.laguta.skryaga.service.util.HelperFactory;
+import by.laguta.skryaga.service.util.Settings;
 import com.joanzapata.iconify.widget.IconTextView;
 import org.joda.time.DateTime;
 import org.joda.time.format.*;
@@ -215,8 +216,16 @@ public class TransactionsAdapter
             } else {
                 amountText = context.getString(R.string.undefined_balance);
             }
+
+            if (transaction.isIncome() && isSecureMode()) {
+                amountText = context.getString(R.string.masked_balance);
+            }
             amountView.setText(amountText);
 
+        }
+
+        private boolean isSecureMode() {
+            return Settings.getInstance().getModel().isSecureModeEnabled();
         }
 
         private void initializeMassage(TransactionUIModel transaction) {
