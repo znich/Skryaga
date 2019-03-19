@@ -250,8 +250,6 @@ public class MainActivity extends AppCompatActivity implements SwipeListener.Tot
 
     private void populateMainInfo() {
         mainInfoModel = calculationService.getMainInfoModel();
-        mainInfoModel.setTotalAmount(15698.13d);
-        mainInfoModel.setGoal(new Goal(new BigDecimal(523), Currency.CurrencyType.USD));
         populateTotalAmount(mainInfoModel);
 
         spentToday.setText(CurrencyUtil.formatCurrencyByn(mainInfoModel.getTodaySpending(), true));
