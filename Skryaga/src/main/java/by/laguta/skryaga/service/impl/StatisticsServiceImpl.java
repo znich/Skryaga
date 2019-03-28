@@ -179,7 +179,8 @@ public class StatisticsServiceImpl implements StatisticsService {
         return lastStatisticsDate;
     }
 
-    private BigDecimal getTransactionAmount(Transaction transaction) throws SQLException {
+    @Override
+    public BigDecimal getTransactionAmount(Transaction transaction) throws SQLException {
         Double transactionAmount = transaction.getAmount() != null ? transaction.getAmount() : 0;
         BigDecimal amount = transaction.isByrCurrency()
                 ? new BigDecimal(transactionAmount)

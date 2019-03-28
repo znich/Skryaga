@@ -53,17 +53,14 @@ public class TransactionDaoImpl extends OrmLiteBaseDAOImpl<Transaction, Long>
     }
 
     @Override
-    public BigDecimal getTodaySpending() throws SQLException {
+    public  List<Transaction> getTodaySpendingTransactions() throws SQLException {
         QueryBuilder<Transaction, Long> queryBuilder = queryBuilder();
         queryBuilder.where().gt(Transaction.MESSAGE_DATE, new DateTime().withTimeAtStartOfDay())
                 .and().eq(Transaction.TYPE, Transaction.Type.SPENDING)
                 .and().isNull(Transaction.GOAL_TRANSACTION)
                 .and().eq(Transaction.APPROVED_COLUMN, true);
-        ;
         PreparedQuery<Transaction> preparedQuery = queryBuilder.prepare();
-        List<Transaction> transactions = query(preparedQuery);
-
-        return getSumAmount(transactions);
+        return query(preparedQuery);
     }
 
     private BigDecimal getSumAmount(List<Transaction> transactions) {

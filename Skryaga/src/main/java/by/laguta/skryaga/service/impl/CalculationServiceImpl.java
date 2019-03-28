@@ -8,6 +8,7 @@ import by.laguta.skryaga.dao.model.*;
 import by.laguta.skryaga.dao.model.Currency;
 import by.laguta.skryaga.service.CalculationService;
 import by.laguta.skryaga.service.ExchangeRateService;
+import by.laguta.skryaga.service.StatisticsService;
 import by.laguta.skryaga.service.model.Goal;
 import by.laguta.skryaga.service.model.MainInfoModel;
 import by.laguta.skryaga.service.model.TransactionUIModel;
@@ -36,6 +37,7 @@ public class CalculationServiceImpl implements CalculationService {
     private BalanceDao balanceDao;
     private ExchangeRateService exchangeRateService;
     private SpendingStatisticsDao spendingStatisticsDao;
+    private StatisticsService statisticsService;
 
     public CalculationServiceImpl() {
         initializeServices();
@@ -46,6 +48,7 @@ public class CalculationServiceImpl implements CalculationService {
         balanceDao = HelperFactory.getDaoHelper().getBalanceDao();
         spendingStatisticsDao = HelperFactory.getDaoHelper().getSpendingStatisticsDao();
         exchangeRateService = HelperFactory.getServiceHelper().getExchangeRateService();
+        statisticsService = HelperFactory.getServiceHelper().getStatisticsService();
     }
 
     @Override
@@ -87,13 +90,18 @@ public class CalculationServiceImpl implements CalculationService {
 
     @Override
     public Double getTodaySpending() {
-        Double amount = 0d;
+        BigDecimal spendingAmount = new BigDecimal(0);
         try {
-            amount = transactionDao.getTodaySpending().doubleValue();
+            List<Transaction> todaySpendingTransactions = transactionDao.getTodaySpendingTransactions();
+            for (Transaction transaction : todaySpendingTransactions) {
+                BigDecimal transactionAmount = statisticsService.getTransactionAmount(transaction);
+                spendingAmount = spendingAmount.add(transactionAmount);
+            }
+
         } catch (SQLException e) {
             Log.e(TAG, "Error getting spent for today", e);
         }
-        return amount;
+        return spendingAmount.doubleValue();
     }
 
     @Override

@@ -126,9 +126,9 @@ public class MainActivity extends AppCompatActivity implements SwipeListener.Tot
         goalAmount = (TextView) findViewById(R.id.goal_amount_field);
         exchangeRate = (TextView) findViewById(R.id.exchange_amount_field);
 
-        totalAmountSwipeListener = new SwipeListener(totalAmountField, this, this, true);
+        totalAmountSwipeListener = new SwipeListener(totalAmountField, this, this, false);
         totalAmountField.setOnTouchListener(totalAmountSwipeListener);
-        goalAmountSwipeListener = new SwipeListener(goalAmount, this, this, false);
+        goalAmountSwipeListener = new SwipeListener(goalAmount, this, this, true);
         goalAmount.setOnTouchListener(goalAmountSwipeListener);
         refreshLayout = (SwipeRefreshLayout) findViewById(R.id.transactionsRefresh);
         transactionsList = (RecyclerView) findViewById(R.id.transactions_view);

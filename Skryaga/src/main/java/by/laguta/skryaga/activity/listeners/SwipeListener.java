@@ -95,7 +95,7 @@ public class SwipeListener implements View.OnTouchListener {
 
     private void setPosition() {
         if (shouldHide()) {
-            int swipeMargin = getTotalAmount() > 9999 && wideField ? -48 : -32;
+            int swipeMargin = getTotalAmount() > 9999 || wideField ? -48 : -32;
             moveLeftWithAnimation(swipeMargin);
         } else {
             moveLeftWithAnimation(0);

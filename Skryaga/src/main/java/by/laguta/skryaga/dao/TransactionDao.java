@@ -19,7 +19,7 @@ public interface TransactionDao extends Dao<Transaction, Long> {
 
     Transaction getLastTransaction() throws SQLException;
 
-    BigDecimal getTodaySpending() throws  SQLException;
+    List<Transaction> getTodaySpendingTransactions() throws SQLException;
 
     List<Transaction> getSpendingTransactionsBetween(DateTime date, DateTime toDate) throws SQLException;
 
