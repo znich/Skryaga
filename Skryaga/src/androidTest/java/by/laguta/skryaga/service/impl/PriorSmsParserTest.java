@@ -26,7 +26,7 @@ public class PriorSmsParserTest extends AndroidTestCase {
 
     public void testParseSmsOplata() throws ParseException {
         // Given
-        String sms = "Priorbank. Karta 5***1451 09-02-2019 14:53:56. Oplata 61.96 BYN. BLR SOU INTERNETBANK. Dostupno:228.50 BYN. Spravka: 80172899292";
+        String sms = "Priorbank. Karta 5***1451 09-02-2019 14:53:56. Oplata 61.96 BYN. BLR SOU INTERNETBANK. Dostupno: 228.50 BYN. Spravka: 80172899292";
         DateTime date = new DateTime(2019, 2, 9, 14, 53, 56);
         Transaction expected = new Transaction(
                 null,
