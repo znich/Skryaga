@@ -37,7 +37,7 @@ public class PriorSmsParser extends BaseParser implements SmsParser {
             + "\\s+(\\S{3})\\."                 // 6 - currency
             + "\\s+(" + DESCRIPTION_REGEXP + ")"// 7 - description
             + "\\s+[^:]+:"
-            + "\\s*(" + DOUBLE_REGEXP + ")?"       // 8 - balance
+            + "\\s*(?:(" + DOUBLE_REGEXP + ")\\s*(\\S{3})\\.)?"       // 8 - balance
             + "";
 
     private static final String SMS_INCOME_REGEXP = "^Priorbank"
