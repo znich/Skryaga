@@ -6,6 +6,7 @@ import by.laguta.skryaga.service.*;
 import by.laguta.skryaga.service.impl.*;
 import by.laguta.skryaga.service.rest.ServerClient;
 import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ServiceHelper {
 
@@ -79,6 +80,7 @@ public class ServiceHelper {
         if (serverClient == null) {
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(context.getResources().getString(R.string.server_url))
+                    .addConverterFactory(GsonConverterFactory.create())
                     .build();
             serverClient = retrofit.create(ServerClient.class);
         }
