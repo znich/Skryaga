@@ -1,8 +1,11 @@
 package by.laguta.skryaga.service.util;
 
 import android.content.Context;
+import by.laguta.skryaga.R;
 import by.laguta.skryaga.service.*;
 import by.laguta.skryaga.service.impl.*;
+import by.laguta.skryaga.service.rest.ServerClient;
+import retrofit2.Retrofit;
 
 public class ServiceHelper {
 
@@ -13,6 +16,7 @@ public class ServiceHelper {
     private StatisticsService statisticsService;
     private BalanceService balanceService;
     private UssdParser ussdParser;
+    private ServerClient serverClient;
 
     private Context context;
 
@@ -69,5 +73,15 @@ public class ServiceHelper {
             ussdParser = new UssdParserImpl();
         }
         return ussdParser;
+    }
+
+    public ServerClient getServerClient() {
+        if (serverClient == null) {
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(context.getResources().getString(R.string.server_url))
+                    .build();
+            serverClient = retrofit.create(ServerClient.class);
+        }
+        return serverClient;
     }
 }

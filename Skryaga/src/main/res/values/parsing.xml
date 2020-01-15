@@ -3,5 +3,5 @@
     <string name="ecopress_table_selector">.nal</string>
     <string name="ecopress_name_selector">.name</string>
     <string name="ecopress_address_selector">.addr</string>
-    <string name="ecopress_buy_selector">.dark</string>
+    <string name="ecopress_buy_selector">.kursy</string>
 </resources>

@@ -112,7 +112,7 @@ public class CalculationServiceImpl implements CalculationService {
             if (spendingStatistics == null) {
                 return goal;
             }
-            double relative = spendingStatistics.getRelative();
+            double relative = spendingStatistics.getAverage();
 
             boolean nextIncomePrepaid = isNextIncomePrepaid();
 
