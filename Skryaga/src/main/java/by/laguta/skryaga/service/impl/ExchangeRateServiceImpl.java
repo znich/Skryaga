@@ -82,7 +82,7 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
         try {
             Document doc = getDocument();
             Elements table = doc.select(getResourceString(R.string.ecopress_table_selector));
-            Elements rows = table.select("tr");
+            Elements rows = table.select("tr:not(.nnal)");
             List<Element> currencyRows = rows.subList(3, rows.size());
             for (Element row : currencyRows) {
                 ExchangeRate exchangeRate = parseExchangeRate(row, new DateTime());
