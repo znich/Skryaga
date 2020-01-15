@@ -9,6 +9,7 @@ import by.laguta.skryaga.dao.model.ExchangeRate;
 import by.laguta.skryaga.service.ExchangeRateService;
 import by.laguta.skryaga.service.ExchangeRateUpdateException;
 import by.laguta.skryaga.service.UpdateExchangeRateListener;
+import by.laguta.skryaga.service.rest.ServerClient;
 import by.laguta.skryaga.service.util.HelperFactory;
 import by.laguta.skryaga.service.util.UpdateTask;
 import org.joda.time.DateTime;
@@ -17,6 +18,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import retrofit2.Call;
+import retrofit2.Response;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -42,6 +45,8 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
     private ExchangeRateDao exchangeRateDao;
     private Context context;
 
+    private ServerClient serverClient;
+
     public ExchangeRateServiceImpl(Context context) {
         this.context = context;
         this.updateInterval = getResourceInteger(R.integer.exchange_rate_update_interval);
@@ -51,6 +56,7 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
 
     void initialiseServices() {
         exchangeRateDao = HelperFactory.getDaoHelper().getExchangeRateDao();
+        serverClient = HelperFactory.getServiceHelper().getServerClient();
     }
 
     @Override
@@ -216,6 +222,9 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
             }
             try {
                 ExchangeRate lowestRate = getLowestRate();
+                if (lowestRate == null) {
+                    lowestRate = getRateFromService();
+                }
                 if (lowestRate != null) {
                     saveOrUpdateLowestExchangeRate(lowestRate);
                     lastUpdated = new DateTime();
@@ -230,7 +239,36 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
             Set<ExchangeRate> exchangeRates = getExchangeRates();
             return exchangeRates.isEmpty() ? null : Collections.min(exchangeRates);
         }
+    }
 
+    private ExchangeRate getRateFromService() {
+        Call<by.laguta.skryaga.service.rest.model.ExchangeRate> serverRate = serverClient.getLowestRate();
+        try {
+            Response<by.laguta.skryaga.service.rest.model.ExchangeRate> execute = serverRate.execute();
+            if (execute.isSuccessful()) {
+                by.laguta.skryaga.service.rest.model.ExchangeRate exchangeRate = execute.body();
+                if (exchangeRate != null) {
+                    ExchangeRate rate = convertRate(exchangeRate);
+                    saveOrUpdateLowestExchangeRate(rate);
+                    lastUpdated = new DateTime();
+                    return rate;
+                }
+            }
+        } catch (IOException e) {
+            Log.e(TAG, "Error getting exchange rate from server", e);
+        }
+        return null;
+    }
+
+    private ExchangeRate convertRate(by.laguta.skryaga.service.rest.model.ExchangeRate exchangeRate) {
+        return new ExchangeRate(
+                null,
+                DateTime.parse(exchangeRate.getDate()),
+                Currency.CurrencyType.getByValue(exchangeRate.getCurrencyType()),
+                exchangeRate.getBankName(),
+                exchangeRate.getBankAddress(),
+                exchangeRate.getBuyRate(),
+                exchangeRate.getSellRate());
     }
 
 }

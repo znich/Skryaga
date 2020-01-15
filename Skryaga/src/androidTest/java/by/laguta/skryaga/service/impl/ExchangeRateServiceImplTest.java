@@ -1,18 +1,25 @@
 package by.laguta.skryaga.service.impl;
 
 import android.content.Context;
-import android.test.ActivityTestCase;
+import android.test.AndroidTestCase;
 import by.laguta.skryaga.R;
 import by.laguta.skryaga.dao.ExchangeRateDao;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
-import java.io.IOException;
-import java.io.InputStream;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+import java.io.*;
 
 import static com.google.android.testing.mocking.AndroidMock.createMock;
 
-public class ExchangeRateServiceImplTest extends ActivityTestCase {
+public class ExchangeRateServiceImplTest extends AndroidTestCase {
 
     ExchangeRateServiceImpl service;
 
@@ -89,7 +96,7 @@ public class ExchangeRateServiceImplTest extends ActivityTestCase {
 
     private Context getTestContext() {
         try {
-            return getInstrumentation().getTargetContext();
+            return getContext();
         } catch (final Exception e) {
             e.printStackTrace();
             return null;
@@ -99,4 +106,23 @@ public class ExchangeRateServiceImplTest extends ActivityTestCase {
     protected String getStringResource(int id) {
         return getTestContext().getResources().getString(id);
     }
+
+    public void testParseXsl() throws TransformerException, FileNotFoundException, UnsupportedEncodingException {
+        TransformerFactory tFactory = TransformerFactory.newInstance();
+
+        Source xslDoc = new StreamSource(getTestContext().getResources().openRawResource(R.xsl.ecopress));
+
+        InputStream testPage = getTestContext().getResources().openRawResource(R.raw.page);
+
+        Source xmlDoc = new StreamSource(testPage);
+
+        Transformer trasform = tFactory.newTransformer(xslDoc);
+
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+        trasform.transform(xmlDoc, new StreamResult(output));
+
+        System.out.println(output.toString("UTF-8"));
+    }
+
 }
