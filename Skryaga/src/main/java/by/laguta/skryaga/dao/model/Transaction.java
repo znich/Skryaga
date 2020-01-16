@@ -31,19 +31,19 @@ public class Transaction {
             this.values = Arrays.asList(values);
         }
 
-    }
 
+    }
     @DatabaseField(generatedId = true)
     private Long id;
 
     public static final String MESSAGE_DATE = "message_date";
+
     @DatabaseField(canBeNull = false, dataType = DataType.DATE_TIME, columnName = MESSAGE_DATE)
     private DateTime messageDate;
-
     public static final String BANK_ACCOUNT = "bank_account";
+
     @DatabaseField(canBeNull = false, foreign = true, columnName = BANK_ACCOUNT)
     private BankAccount bankAccount;
-
     @DatabaseField(canBeNull = true, width = 30, columnName = "cardNumber")
     private String cardNumber;
 
@@ -51,16 +51,16 @@ public class Transaction {
     private CurrencyType currencyType;
 
     public static final String DATE_COLUMN = "date";
+
     @DatabaseField(canBeNull = false, dataType = DataType.DATE_TIME, columnName = DATE_COLUMN)
     private DateTime date;
-
     @DatabaseField(canBeNull = true, columnName = "amount")
     private Double amount;
 
     public static final String TYPE = "type";
+
     @DatabaseField(canBeNull = false, dataType = DataType.ENUM_STRING, columnName = TYPE)
     private Type type;
-
     @DatabaseField(canBeNull = false, width = 300, columnName = "message")
     private String message;
 
@@ -71,16 +71,16 @@ public class Transaction {
     private boolean accumulation;
 
     public static final String APPROVED_COLUMN = "approved";
+
     @DatabaseField(canBeNull = false, defaultValue = "false", columnName = APPROVED_COLUMN)
     private boolean approved;
-
     @DatabaseField(canBeNull = true, foreign = true, columnName = "balance")
     private Balance balance;
 
     public static final String GOAL_TRANSACTION = "goal_transaction";
+
     @DatabaseField(canBeNull = true, foreign = true, columnName = GOAL_TRANSACTION)
     private GoalTransaction goalTransaction;
-
     public Transaction() {
     }
 
@@ -249,6 +249,10 @@ public class Transaction {
 
     public void setGoalTransaction(GoalTransaction goalTransaction) {
         this.goalTransaction = goalTransaction;
+    }
+
+    public boolean isSpending() {
+        return getType() == Type.SPENDING && getGoalTransaction() == null && isApproved();
     }
 
     @Override

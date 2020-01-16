@@ -30,6 +30,9 @@ public class UserSettings {
     @DatabaseField(canBeNull = true, columnName = "secureModeEnabled", defaultValue = "false")
     private Boolean secureModeEnabled;
 
+    @DatabaseField(canBeNull = true, columnName = "showDailySpending", defaultValue = "false")
+    private Boolean showDailySpending;
+
     public UserSettings() {
     }
 
@@ -40,12 +43,13 @@ public class UserSettings {
     }
 
     public UserSettings(
-            Long id, Integer salaryDate, Integer prepaidDate, boolean secureModeEnabled, boolean transactionsProcessed) {
+            Long id, Integer salaryDate, Integer prepaidDate, boolean secureModeEnabled, boolean transactionsProcessed, boolean showDailySpending) {
         this.id = id;
         this.salaryDate = salaryDate;
         this.prepaidDate = prepaidDate;
         this.secureModeEnabled = secureModeEnabled;
         this.transactionsProcessed = transactionsProcessed;
+        this.showDailySpending = showDailySpending;
     }
 
     public Long getId() {
@@ -96,10 +100,21 @@ public class UserSettings {
         this.secureModeEnabled = secureModeEnabled;
     }
 
+    public Boolean getShowDailySpending() {
+        return showDailySpending;
+    }
+
+    public void setShowDailySpending(Boolean showDailySpending) {
+        this.showDailySpending = showDailySpending;
+    }
+
     public boolean isSecureModeEnabled() {
         return secureModeEnabled != null && secureModeEnabled;
     }
 
+    public boolean isShowDailySpending() {
+        return showDailySpending != null && showDailySpending;
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -125,6 +140,10 @@ public class UserSettings {
             return false;
         }
 
+        if (showDailySpending != null ? !showDailySpending.equals(that.showDailySpending) : that.showDailySpending != null) {
+            return false;
+        }
+
         //noinspection RedundantIfStatement
         if (transactionsProcessed != null
                 ? !transactionsProcessed.equals(that.transactionsProcessed)
@@ -143,6 +162,8 @@ public class UserSettings {
         result = 31 * result + (salaryDate != null ? salaryDate.hashCode() : 0);
         result = 31 * result + (prepaidDate != null ? prepaidDate.hashCode() : 0);
         result = 31 * result + (transactionsProcessed != null ? transactionsProcessed.hashCode() : 0);
+        result = 31 * result + (secureModeEnabled != null ? secureModeEnabled.hashCode() : 0);
+        result = 31 * result + (showDailySpending != null ? showDailySpending.hashCode() : 0);
         return result;
     }
 }

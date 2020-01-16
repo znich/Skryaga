@@ -28,7 +28,7 @@ public class DBConnector extends OrmLiteSqliteOpenHelper {
     public static final String DATABASE_NAME = "skryaga_dev.db";
 
     //с каждым увеличением версии, при нахождении в устройстве БД с предыдущей версией будет выполнен метод onUpgrade();
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
 
     private Context context;
 
@@ -95,7 +95,14 @@ public class DBConnector extends OrmLiteSqliteOpenHelper {
                 try {
                     getUserSettingsDao().executeRaw("ALTER TABLE `user_settings` ADD COLUMN secureModeEnabled boolean");
                 } catch (SQLException e) {
-                    Log.e(TAG, "Error updating denomination", e);
+                    Log.e(TAG, "Error updating table", e);
+                }
+                break;
+            case 5:
+                try {
+                    getUserSettingsDao().executeRaw("ALTER TABLE `user_settings` ADD COLUMN showDailySpending boolean");
+                } catch (SQLException e) {
+                    Log.e(TAG, "Error updating table", e);
                 }
                 break;
         }

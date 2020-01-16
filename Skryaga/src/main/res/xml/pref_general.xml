@@ -17,6 +17,12 @@
             android:title="@string/secureModePreference"
             android:defaultValue="false"/>
 
+    <by.laguta.skryaga.activity.preference.ShowDailySpendingPreference
+            android:key="@string/showDailySpending"
+            android:title="@string/showDailySpendingTitle"
+            android:summary="@string/showDailySpendingPreference"
+            android:defaultValue="false"/>
+
     <by.laguta.skryaga.activity.preference.TransactionsUpdatePreference
             android:title="@string/updatePreference"
             android:key="@string/transactionsProcessed"

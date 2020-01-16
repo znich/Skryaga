@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import by.laguta.skryaga.R;
-import by.laguta.skryaga.activity.adapter.view.DateItem;
+import by.laguta.skryaga.activity.adapter.view.DayDelimiterItem;
 import by.laguta.skryaga.activity.adapter.view.TransactionItem;
 import by.laguta.skryaga.activity.adapter.view.ListItem;
 import by.laguta.skryaga.activity.dialog.GoalDialog;
@@ -17,6 +17,7 @@ import by.laguta.skryaga.dao.TransactionDao;
 import by.laguta.skryaga.dao.model.GoalTransaction;
 import by.laguta.skryaga.dao.model.Transaction;
 import by.laguta.skryaga.service.model.GoalTransactionUIModel;
+import by.laguta.skryaga.service.model.TransactionDayListModel;
 import by.laguta.skryaga.service.model.TransactionUIModel;
 import by.laguta.skryaga.service.util.ConvertUtil;
 import by.laguta.skryaga.service.util.CurrencyUtil;
@@ -30,7 +31,6 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Author : Anatoly
@@ -48,18 +48,21 @@ public class TransactionsAdapter
 
     private Context context;
 
-    public TransactionsAdapter(Map<DateTime, List<TransactionUIModel>> transactions, Context context) {
+    public TransactionsAdapter(List<TransactionDayListModel> transactions, Context context) {
         this.context = context;
         populateConsolidatedList(transactions);
     }
 
-    private void populateConsolidatedList(Map<DateTime, List<TransactionUIModel>> transactions) {
+    private void populateConsolidatedList(List<TransactionDayListModel> transactions) {
         consolidatedList = new ArrayList<>();
-        for (DateTime dateTime : transactions.keySet()) {
-            DateItem dateItem = new DateItem(formatDate(dateTime));
-            consolidatedList.add(dateItem);
+        for (TransactionDayListModel transactionDayListModel : transactions) {
+            String formattedDate = formatDate(transactionDayListModel.getDate());
+            Double amount = transactionDayListModel.getAmount();
+            String formattedAmount = amount != null ? CurrencyUtil.formatCurrency(amount, transactionDayListModel.getCurrency()) : "";
+            DayDelimiterItem dayDelimiterItem = new DayDelimiterItem(formattedDate, formattedAmount);
+            consolidatedList.add(dayDelimiterItem);
 
-            for (TransactionUIModel transactionUIModel : transactions.get(dateTime)) {
+            for (TransactionUIModel transactionUIModel : transactionDayListModel.getTransactions()) {
                 TransactionItem transactionItem = new TransactionItem(transactionUIModel);
                 consolidatedList.add(transactionItem);
             }
@@ -90,7 +93,7 @@ public class TransactionsAdapter
                 viewHolder = new TransactionListItemHolder(v1, this);
                 break;
 
-            case ListItem.TYPE_DATE:
+            case ListItem.TYPE_DAY_DELIMITER:
                 View v2 = inflater.inflate(R.layout.date_list_item, parent, false);
                 viewHolder = new DateViewHolder(v2);
                 break;
@@ -109,10 +112,10 @@ public class TransactionsAdapter
                 TransactionListItemHolder transactionListItemHolder = (TransactionListItemHolder) holder;
                 transactionListItemHolder.populate(transactionItem.getModel(), context);
                 break;
-            case ListItem.TYPE_DATE:
-                DateItem dateItem = (DateItem) consolidatedList.get(position);
+            case ListItem.TYPE_DAY_DELIMITER:
+                DayDelimiterItem dayDelimiterItem = (DayDelimiterItem) consolidatedList.get(position);
                 DateViewHolder dateViewHolder = (DateViewHolder) holder;
-                dateViewHolder.populate(dateItem.getDate());
+                dateViewHolder.populate(dayDelimiterItem);
                 break;
         }
     }
@@ -318,9 +321,18 @@ public class TransactionsAdapter
             super(itemView);
         }
 
-        public void populate(String date) {
+        public void populate(DayDelimiterItem dayDelimiterItem) {
             TextView dateView = (TextView) itemView.findViewById(R.id.groupTransactionDate);
-            dateView.setText(date);
+            dateView.setText(dayDelimiterItem.getDate());
+
+            TextView amountView = (TextView) itemView.findViewById(R.id.groupTransactionAmount);
+            String amount = dayDelimiterItem.getAmount();
+            if (amount == null || amount.length() == 0) {
+                amountView.setVisibility(View.INVISIBLE);
+            } else {
+                amountView.setText(amount);
+                amountView.setVisibility(View.VISIBLE);
+            }
         }
     }
 

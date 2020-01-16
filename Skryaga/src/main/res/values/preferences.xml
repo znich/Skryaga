@@ -3,6 +3,7 @@
     <string name="salaryDate">salaryDate</string>
     <string name="prepaidDate">prepaidDate</string>
     <string name="secureMode">secureModeEnabled</string>
+    <string name="showDailySpending">showDailySpending</string>
     <string name="transactionsProcessed">transactionsProcessed</string>
     <string name="createBackup">createBackup</string>
     <string name="restoreBackup">restoreBackup</string>
