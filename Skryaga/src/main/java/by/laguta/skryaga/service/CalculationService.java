@@ -2,6 +2,7 @@ package by.laguta.skryaga.service;
 
 import by.laguta.skryaga.service.model.Goal;
 import by.laguta.skryaga.service.model.MainInfoModel;
+import by.laguta.skryaga.service.model.TransactionDayListModel;
 import by.laguta.skryaga.service.model.TransactionUIModel;
 import org.joda.time.DateTime;
 
@@ -26,5 +27,5 @@ public interface CalculationService {
 
     List<TransactionUIModel> getAllTransactions();
 
-    Map<DateTime, List<TransactionUIModel>> getGroupedTransactions();
+    List<TransactionDayListModel> getDayTransactionModels();
 }

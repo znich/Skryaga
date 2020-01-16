@@ -23,7 +23,6 @@ import by.laguta.skryaga.activity.adapter.TransactionsAdapter;
 import by.laguta.skryaga.activity.dialog.Progress;
 import by.laguta.skryaga.activity.dialog.UssdBalanceDialog;
 import by.laguta.skryaga.activity.listeners.SwipeListener;
-import by.laguta.skryaga.dao.model.Currency;
 import by.laguta.skryaga.dao.model.ExchangeRate;
 import by.laguta.skryaga.dao.model.UserSettings;
 import by.laguta.skryaga.service.*;
@@ -42,7 +41,6 @@ import org.joda.time.DateTime;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.*;
 
 
@@ -178,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements SwipeListener.Tot
 
     private void updateTransactionList() {
         TransactionsAdapter transactionsAdapter = new TransactionsAdapter(
-                calculationService.getGroupedTransactions(), this);
+                calculationService.getDayTransactionModels(), this);
         transactionsList.setAdapter(transactionsAdapter);
     }
 
@@ -321,7 +319,9 @@ public class MainActivity extends AppCompatActivity implements SwipeListener.Tot
             int salaryDate = sharedPreferences.getInt(getString(R.string.salaryDate), 20);
             int prepaidDate = sharedPreferences.getInt(getString(R.string.prepaidDate), 20);
             boolean secureModeEnabled = sharedPreferences.getBoolean(getString(R.string.secureMode), false);
-            UserSettings userSettings = new UserSettings(null, salaryDate, prepaidDate, secureModeEnabled, true);
+            boolean showDailySpending = sharedPreferences.getBoolean(getString(R.string.showDailySpending), false);
+
+            UserSettings userSettings = new UserSettings(null, salaryDate, prepaidDate, secureModeEnabled, true, showDailySpending);
 
             Settings settings = Settings.getInstance();
             UserSettings currentModel = settings.getModel();

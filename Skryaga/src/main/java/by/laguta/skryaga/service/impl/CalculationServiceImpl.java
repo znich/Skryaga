@@ -11,6 +11,7 @@ import by.laguta.skryaga.service.ExchangeRateService;
 import by.laguta.skryaga.service.StatisticsService;
 import by.laguta.skryaga.service.model.Goal;
 import by.laguta.skryaga.service.model.MainInfoModel;
+import by.laguta.skryaga.service.model.TransactionDayListModel;
 import by.laguta.skryaga.service.model.TransactionUIModel;
 import by.laguta.skryaga.service.util.ConvertUtil;
 import by.laguta.skryaga.service.util.HelperFactory;
@@ -90,16 +91,23 @@ public class CalculationServiceImpl implements CalculationService {
 
     @Override
     public Double getTodaySpending() {
-        BigDecimal spendingAmount = new BigDecimal(0);
         try {
             List<Transaction> todaySpendingTransactions = transactionDao.getTodaySpendingTransactions();
-            for (Transaction transaction : todaySpendingTransactions) {
-                BigDecimal transactionAmount = statisticsService.getTransactionAmount(transaction);
-                spendingAmount = spendingAmount.add(transactionAmount);
-            }
+            return getSummarySpendingAmount(todaySpendingTransactions);
 
         } catch (SQLException e) {
             Log.e(TAG, "Error getting spent for today", e);
+        }
+        return 0d;
+    }
+
+    private Double getSummarySpendingAmount(List<Transaction> transactions) throws SQLException {
+        BigDecimal spendingAmount = new BigDecimal(0);
+        for (Transaction transaction : transactions) {
+            if (transaction.isSpending()) {
+                BigDecimal transactionAmount = statisticsService.getTransactionAmount(transaction);
+                spendingAmount = spendingAmount.add(transactionAmount);
+            }
         }
         return spendingAmount.doubleValue();
     }
@@ -148,32 +156,59 @@ public class CalculationServiceImpl implements CalculationService {
 
     @Override
     public List<TransactionUIModel> getAllTransactions() {
-        List<Transaction> transactions = new ArrayList<Transaction>();
+        List<Transaction> transactions = getTransactions();
+        return ConvertUtil.convertToUIModels(transactions);
+    }
+
+    private List<Transaction> getTransactions() {
+        List<Transaction> transactions = new ArrayList<>();
         try {
             transactions = transactionDao.getTransactionsList();
         } catch (SQLException e) {
             Log.e(TAG, "Error getting transactions", e);
         }
-        return ConvertUtil.convertToUIModels(transactions);
+        return transactions;
     }
 
     @Override
-    public Map<DateTime, List<TransactionUIModel>> getGroupedTransactions() {
-        Map<DateTime, List<TransactionUIModel>> dateTimeListHashMap = new LinkedHashMap<>();
+    public List<TransactionDayListModel> getDayTransactionModels() {
+        List<Transaction> transactions = getTransactions();
+        Map<DateTime, List<Transaction>> gropedTransactions = groupTransactions(transactions);
 
-        List<TransactionUIModel> allTransactions = getAllTransactions();
-
-        for (TransactionUIModel transactionUIModel : allTransactions) {
-            DateTime date = transactionUIModel.getTransactionDate().withTimeAtStartOfDay();
-            List<TransactionUIModel> transactionUIModels = dateTimeListHashMap.get(date);
-            if (transactionUIModels == null) {
-                transactionUIModels = new ArrayList<>();
-                dateTimeListHashMap.put(date, transactionUIModels);
+        List<TransactionDayListModel> transactionDayListModels = new ArrayList<>();
+        for (Map.Entry<DateTime, List<Transaction>> entry : gropedTransactions.entrySet()) {
+            DateTime date = entry.getKey();
+            List<Transaction> list = entry.getValue();
+            List<TransactionUIModel> transactionUIModels = ConvertUtil.convertToUIModels(list);
+            Double summarySpendingAmount = null;
+            if (Settings.getInstance().getModel().isShowDailySpending()) {
+                try {
+                    summarySpendingAmount = getSummarySpendingAmount(list);
+                } catch (SQLException e) {
+                    Log.e(TAG, "Error getting spent for date: " + date, e);
+                }
             }
-            transactionUIModels.add(transactionUIModel);
+
+            TransactionDayListModel transactionDayListModel = new TransactionDayListModel(date, summarySpendingAmount, Currency.CurrencyType.BYR, transactionUIModels);
+            transactionDayListModels.add(transactionDayListModel);
         }
 
-        return dateTimeListHashMap;
+        return transactionDayListModels;
+    }
+
+    private Map<DateTime, List<Transaction>> groupTransactions(List<Transaction> transactions) {
+        Map<DateTime, List<Transaction>> gropedTransactions = new LinkedHashMap<>();
+
+        for (Transaction transaction : transactions) {
+            DateTime date = transaction.getDate().withTimeAtStartOfDay();
+            List<Transaction> transactionList = gropedTransactions.get(date);
+            if (transactionList == null) {
+                transactionList = new ArrayList<>();
+                gropedTransactions.put(date, transactionList);
+            }
+            transactionList.add(transaction);
+        }
+        return gropedTransactions;
     }
 
     private long getDaysBeforePrepaid() {
