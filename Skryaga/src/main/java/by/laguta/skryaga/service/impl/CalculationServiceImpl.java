@@ -67,7 +67,7 @@ public class CalculationServiceImpl implements CalculationService {
     private Double getDailyAmount() {
         try {
             SpendingStatistics lastStatistics = spendingStatisticsDao.getLastStatistics();
-            return lastStatistics == null ? 0d : lastStatistics.getRelative();
+            return lastStatistics == null ? 0d : lastStatistics.getAverage();
         } catch (SQLException e) {
             Log.e(TAG, "Error getting daily amount");
         }
