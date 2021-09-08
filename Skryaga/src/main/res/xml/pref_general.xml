@@ -23,6 +23,12 @@
             android:summary="@string/showDailySpendingPreference"
             android:defaultValue="false"/>
 
+    <by.laguta.skryaga.activity.preference.AcceptedCardPreference
+            android:key="@string/acceptedCard"
+            android:title="@string/acceptedCardTitle"
+            android:summary="@string/acceptedCardSummary"
+            android:defaultValue=""/>
+
     <by.laguta.skryaga.activity.preference.TransactionsUpdatePreference
             android:title="@string/updatePreference"
             android:key="@string/transactionsProcessed"

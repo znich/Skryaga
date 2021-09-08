@@ -23,6 +23,8 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Date;
 
+import static org.jsoup.helper.StringUtil.isBlank;
+
 /**
  * Revision Info : $Author$ $Date$
  * Author : Anatoly
@@ -92,6 +94,10 @@ public class SmsService extends Service {
                 // do not process already saved transaction
                 return;
             }
+            if (!isAcceptedCard(transaction)) {
+                return;
+            }
+
             BankAccount bankAccount = bankAccountDao.getByNumber(smsSender);
             transaction.setBankAccount(bankAccount);
             transaction.setMessageDate(messageDate);
@@ -104,6 +110,12 @@ public class SmsService extends Service {
             Log.d(TAG, "Error saving transaction from message:\n" + smsBody);
             Log.e(TAG, "Error saving transaction " + smsSender, e);
         }
+    }
+
+    private boolean isAcceptedCard(Transaction transaction) {
+        String cardNumber = transaction.getCardNumber();
+        String acceptedCardNumber = Settings.getInstance().getAcceptedCardNumber();
+        return isBlank(acceptedCardNumber) || (!isBlank(cardNumber) && cardNumber.equals(acceptedCardNumber));
     }
 
     private void updateTransactionsPrivate() {

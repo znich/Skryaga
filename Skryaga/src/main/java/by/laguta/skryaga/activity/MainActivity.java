@@ -320,8 +320,9 @@ public class MainActivity extends AppCompatActivity implements SwipeListener.Tot
             int prepaidDate = sharedPreferences.getInt(getString(R.string.prepaidDate), 20);
             boolean secureModeEnabled = sharedPreferences.getBoolean(getString(R.string.secureMode), false);
             boolean showDailySpending = sharedPreferences.getBoolean(getString(R.string.showDailySpending), false);
+            String acceptedCardNumber = sharedPreferences.getString(getString(R.string.acceptedCard), null);
 
-            UserSettings userSettings = new UserSettings(null, salaryDate, prepaidDate, secureModeEnabled, true, showDailySpending);
+            UserSettings userSettings = new UserSettings(null, salaryDate, prepaidDate, secureModeEnabled, true, showDailySpending, acceptedCardNumber);
 
             Settings settings = Settings.getInstance();
             UserSettings currentModel = settings.getModel();

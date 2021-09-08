@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -69,7 +70,11 @@ public class StatisticsServiceImpl implements StatisticsService {
                 SpendingStatistics spendingStatistics;
 
                 double[] amountArray = calculateAmounts(statisticsDays, transactions);
-
+                /*String amm = "";
+                for (double am : amountArray) {
+                    amm += am + "\n";
+                }
+                //System.out.println(amm);*/
                 if (amountArray.length == 0) {
                     spendingStatistics = new SpendingStatistics(null, lastStatisticsDate, 0d, 0d, 0d);
                 } else {
@@ -113,7 +118,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     private double[] calculateAmounts(List<DateTime> statisticsDays, List<Transaction> transactions) throws SQLException {
-        HashMap<DateTime, BigDecimal> spendingMap = new HashMap<DateTime, BigDecimal>();
+        HashMap<DateTime, BigDecimal> spendingMap = new LinkedHashMap<>();
 
         for (DateTime statisticsDay : statisticsDays) {
             spendingMap.put(statisticsDay, new BigDecimal(0d));

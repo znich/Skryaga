@@ -42,6 +42,10 @@
     <string name="dialog_balance_message">Do you really want to sent USSD request to update your balance?</string>
     <string name="dialog_balance_label">4 last numbers of card:</string>
     <string name="unknown_income_transaction">Income operation</string>
+    <string name="acceptedCardTitle">Setup card number</string>
+    <string name="acceptedCardSummary">The card number to be included to the Skryaga statistics</string>
+    <string name="acceptedCardSummaryCurrent">Current value</string>
+
 
 
 </resources>

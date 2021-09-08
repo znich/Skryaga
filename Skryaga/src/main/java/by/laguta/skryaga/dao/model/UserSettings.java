@@ -27,6 +27,9 @@ public class UserSettings {
     @DatabaseField(canBeNull = true, columnName = "cardNumber")
     private String cardNumber;
 
+    @DatabaseField(canBeNull = true, columnName = "acceptedCardNumber")
+    private String acceptedCardNumber;
+
     @DatabaseField(canBeNull = true, columnName = "secureModeEnabled", defaultValue = "false")
     private Boolean secureModeEnabled;
 
@@ -43,13 +46,14 @@ public class UserSettings {
     }
 
     public UserSettings(
-            Long id, Integer salaryDate, Integer prepaidDate, boolean secureModeEnabled, boolean transactionsProcessed, boolean showDailySpending) {
+            Long id, Integer salaryDate, Integer prepaidDate, boolean secureModeEnabled, boolean transactionsProcessed, boolean showDailySpending, String acceptedCardNumber) {
         this.id = id;
         this.salaryDate = salaryDate;
         this.prepaidDate = prepaidDate;
         this.secureModeEnabled = secureModeEnabled;
         this.transactionsProcessed = transactionsProcessed;
         this.showDailySpending = showDailySpending;
+        this.acceptedCardNumber = acceptedCardNumber;
     }
 
     public Long getId() {
@@ -90,6 +94,14 @@ public class UserSettings {
 
     public void setCardNumber(String cardNumber) {
         this.cardNumber = cardNumber;
+    }
+
+    public String getAcceptedCardNumber() {
+        return acceptedCardNumber;
+    }
+
+    public void setAcceptedCardNumber(String acceptedCardNumber) {
+        this.acceptedCardNumber = acceptedCardNumber;
     }
 
     public Boolean getSecureModeEnabled() {
@@ -133,6 +145,10 @@ public class UserSettings {
         }
 
         if (cardNumber != null ? !cardNumber.equals(that.cardNumber) : that.cardNumber != null) {
+            return false;
+        }
+
+        if (acceptedCardNumber != null ? !acceptedCardNumber.equals(that.acceptedCardNumber) : that.acceptedCardNumber != null) {
             return false;
         }
 

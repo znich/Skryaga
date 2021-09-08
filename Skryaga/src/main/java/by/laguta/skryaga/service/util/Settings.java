@@ -6,6 +6,7 @@ import by.laguta.skryaga.dao.model.UserSettings;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Author : Anatoly
@@ -71,5 +72,9 @@ public class Settings {
 
     public UserSettings getModel() {
         return model;
+    }
+
+    public String getAcceptedCardNumber() {
+        return model.getAcceptedCardNumber();
     }
 }

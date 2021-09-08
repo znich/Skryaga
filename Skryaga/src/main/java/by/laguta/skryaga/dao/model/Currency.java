@@ -21,7 +21,8 @@ public class Currency {
         BYR("BYR", "BLR", "BYN"),
         USD("USD"),
         RUB("RUB"),
-        EUR("EUR");
+        EUR("EUR"),
+        RSD("RSD");
 
         private List<String> values;
 
